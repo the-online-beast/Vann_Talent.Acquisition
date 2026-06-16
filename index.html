@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script src="jobs.js"></script>
+
 </head>
 <body>
 
@@ -134,14 +136,145 @@
       </div>
     </section>
 
-    <!-- ============================================================
-         SECTION 2 — VACANCIES (placeholder, section 2 à venir)
-    ============================================================ -->
-    <section id="vacancies" class="section vacancies">
-      <div class="container">
-        <p class="placeholder-text">— Vacancies section coming next —</p>
+   <!-- ============================================================
+     SECTION 2 — VACANCIES
+============================================================ -->
+<section id="vacancies" class="section vacancies">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="section-header">
+      <div class="about__tag">Open Positions</div>
+      <h2 class="section-title">Current Vacancies</h2>
+      <p class="section-subtitle">
+        Roles across international schools, private institutions
+        and tuition centres in Malaysia.
+      </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="vacancies__filters" id="vacanciesFilters">
+      <button class="filter-btn is-active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="Full-time">Full-time</button>
+      <button class="filter-btn" data-filter="Part-time">Part-time</button>
+      <button class="filter-btn" data-filter="Contract">Contract</button>
+    </div>
+
+    <!-- States -->
+    <div class="vacancies__loading" id="vacanciesLoading">
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
       </div>
-    </section>
+      <p>Loading positions...</p>
+    </div>
+
+    <div class="vacancies__empty" id="vacanciesEmpty">
+      <p>No positions available at the moment.</p>
+      <p class="vacancies__empty-sub">
+        Submit your CV and I will contact you when a relevant role opens up.
+      </p>
+      <a href="#cv-form" class="btn btn--outline" id="openCvFormVacancies">
+        Submit your CV
+      </a>
+    </div>
+
+    <div class="vacancies__error" id="vacanciesError">
+      <p>Unable to load positions right now.</p>
+      <button class="btn btn--outline" id="retryBtn">Try again</button>
+    </div>
+
+    <!-- Job list -->
+    <div class="jobs-grid" id="jobsGrid"></div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     MODAL — JOB DETAIL + APPLY
+============================================================ -->
+<div class="modal-overlay" id="jobModal" role="dialog" aria-modal="true" aria-labelledby="jobModalTitle">
+  <div class="modal modal--wide">
+    <button class="modal__close" id="closeJobModal" aria-label="Close">✕</button>
+
+    <!-- JD Content -->
+    <div class="job-detail" id="jobDetail">
+
+      <div class="job-detail__header">
+        <div class="job-detail__meta">
+          <span class="job-tag" id="jd-type"></span>
+          <span class="job-tag job-tag--muted" id="jd-subject"></span>
+        </div>
+        <h2 class="job-detail__title" id="jobModalTitle"></h2>
+        <div class="job-detail__info">
+          <span id="jd-location">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8" width="13" height="13">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span></span>
+          </span>
+          <span id="jd-salary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8" width="13" height="13">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span></span>
+          </span>
+          <span id="jd-date">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8" width="13" height="13">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="job-detail__divider"></div>
+
+      <div class="job-detail__body">
+        <div class="job-detail__section">
+          <h4>About the role</h4>
+          <div id="jd-description" class="job-detail__text"></div>
+        </div>
+        <div class="job-detail__section">
+          <h4>Requirements</h4>
+          <div id="jd-requirements" class="job-detail__text"></div>
+        </div>
+      </div>
+
+      <div class="job-detail__footer">
+        <button class="btn btn--solid" id="openApplyForm">
+          Apply for this position
+        </button>
+        <p class="job-detail__footer-note">
+          Your application will be reviewed personally.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — APPLY FORM (logique n8n à venir étape 5)
+============================================================ -->
+<div class="modal-overlay" id="applyModal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
+  <div class="modal">
+    <button class="modal__close" id="closeApplyModal" aria-label="Close">✕</button>
+    <h2 class="modal__title" id="applyModalTitle">Apply</h2>
+    <p class="modal__subtitle" id="applyModalSubtitle"></p>
+    <div class="modal__placeholder">
+      <p>Apply form will be connected to n8n in step 5.</p>
+    </div>
+  </div>
+</div>
+
 
     <!-- ============================================================
          SECTION 3 — CONTACT / FOOTER (placeholder)
@@ -169,7 +302,9 @@
     </div>
   </div>
 
+  <script src="jobs.js"></script>
   <script src="main.js"></script>
+
 </body>
 </html>
 
