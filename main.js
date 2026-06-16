@@ -85,8 +85,6 @@ function showState(state, count = 0) {
 // ============================================================
 // VACANCIES — Data & Render
 // ============================================================
-const SHEET_ID  = '1vE-EIMhnGogl06y88CRh0Fu3mt6IGBWUthgPAeJHj8A';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
 
 let allJobs = [];
 
