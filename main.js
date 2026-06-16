@@ -52,15 +52,36 @@ document.addEventListener('keydown', (e) => {
 // ============================================================
 // VACANCIES — State helpers
 // ============================================================
-function showState(state) {
-  // state: 'loading' | 'empty' | 'error' | 'results'
+function showState(state, count = 0) {
+  // Reset all
   document.getElementById('vacanciesLoading').classList.remove('is-visible');
   document.getElementById('vacanciesEmpty').classList.remove('is-visible');
   document.getElementById('vacanciesError').classList.remove('is-visible');
   document.getElementById('jobsGrid').style.display = 'none';
   document.getElementById('vacanciesFilters').style.display = 'none';
 
+  const counter = document.getElementById('vacanciesCount');
+  counter.className = 'vacancies__count';
+  counter.textContent = '';
+
   if (state === 'loading') {
     document.getElementById('vacanciesLoading').classList.add('is-visible');
+
+  } else if (state === 'empty') {
+    document.getElementById('vacanciesEmpty').classList.add('is-visible');
+    counter.classList.add('is-red');
+    counter.textContent = 'No open positions at the moment.';
+
+  } else if (state === 'error') {
+    document.getElementById('vacanciesError').classList.add('is-visible');
+
+  } else if (state === 'results') {
+    document.getElementById('jobsGrid').style.display = 'grid';
+    document.getElementById('vacanciesFilters').style.display = 'flex';
+    counter.classList.add('is-green');
+    counter.textContent = `${count} open position${count > 1 ? 's' : ''}`;
+  }
+}
+
   
 
