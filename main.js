@@ -48,3 +48,19 @@ document.addEventListener('keydown', (e) => {
     document.body.style.overflow = '';
   }
 });
+
+// ============================================================
+// VACANCIES — State helpers
+// ============================================================
+function showState(state) {
+  // state: 'loading' | 'empty' | 'error' | 'results'
+  document.getElementById('vacanciesLoading').classList.remove('is-visible');
+  document.getElementById('vacanciesEmpty').classList.remove('is-visible');
+  document.getElementById('vacanciesError').classList.remove('is-visible');
+  document.getElementById('jobsGrid').style.display = 'none';
+  document.getElementById('vacanciesFilters').style.display = 'none';
+
+  if (state === 'loading') {
+    document.getElementById('vacanciesLoading').classList.add('is-visible');
+  
+
