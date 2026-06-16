@@ -159,6 +159,21 @@
       <button class="filter-btn" data-filter="Part-time">Part-time</button>
       <button class="filter-btn" data-filter="Contract">Contract</button>
     </div>
+    <div class="vacancies__filters" id="vacanciesFilters" style="display:none">
+  <input 
+    type="text" 
+    id="filterSearch" 
+    placeholder="Search by title, school, location…"
+    class="filter-input"
+  />
+  <select id="filterType" class="filter-select">
+    <option value="">All types</option>
+    <option value="Full-time">Full-time</option>
+    <option value="Part-time">Part-time</option>
+    <option value="Contract">Contract</option>
+  </select>
+</div>
+
 
     <!-- States -->
     <div class="vacancies__loading" id="vacanciesLoading">
