@@ -93,18 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function parseGviz(raw) {
     const json = JSON.parse(raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
-    const cols = json.table.cols.map(c => c.label);
-    console.log('COLS:', cols);          // <-- ajoute ça
-    console.log('ROWS:', json.table.rows); // <-- et ça
     const rows = json.table.rows;
-    return rows.map(row => {
+    
+    // La première row contient les headers
+    const cols = rows[0].c.map(cell => cell?.v ?? '');
+    
+    return rows.slice(1).map(row => {
       const job = {};
       cols.forEach((col, i) => {
         job[col] = row.c[i]?.v ?? '';
       });
       return job;
     });
-  }
+}
 
 
   function renderCards(jobs) {
