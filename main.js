@@ -82,6 +82,105 @@ function showState(state, count = 0) {
     counter.textContent = `${count} open position${count > 1 ? 's' : ''}`;
   }
 }
+// ============================================================
+// VACANCIES — Data & Render
+// ============================================================
+const SHEET_ID  = '1vE-EIMhnGogl06y88CRh0Fu3mt6IGBWUthgPAeJHj8A';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+
+let allJobs = [];
+
+// ---- Parse gviz response -----------------------------------
+function parseGviz(raw) {
+  // gviz wraps JSON in /*O_o*/ google.visualization.Query.setResponse({...});
+  const json = JSON.parse(raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+  const cols  = json.table.cols.map(c => c.label);
+  const rows  = json.table.rows;
+
+  return rows.map(row => {
+    const job = {};
+    cols.forEach((col, i) => {
+      job[col] = row.c[i]?.v ?? '';
+    });
+    return job;
+  });
+}
+
+// ---- Render ------------------------------------------------
+function renderCards(jobs) {
+  const grid = document.getElementById('jobsGrid');
+  grid.innerHTML = '';
+
+  jobs.forEach(job => {
+    const card = document.createElement('div');
+    card.className = 'job-card';
+    card.innerHTML = `
+      <div class="job-card__header">
+        <span class="job-card__tag">${job.Type || 'Role'}</span>
+        <span class="job-card__location">📍 ${job.Location || 'Malaysia'}</span>
+      </div>
+      <h3 class="job-card__title">${job.Title}</h3>
+      <p class="job-card__school">${job.School || ''}</p>
+      <ul class="job-card__details">
+        ${job.Salary   ? `<li>💰 ${job.Salary}</li>`   : ''}
+        ${job.Start    ? `<li>🗓 ${job.Start}</li>`    : ''}
+        ${job.Subject  ? `<li>📚 ${job.Subject}</li>`  : ''}
+      </ul>
+      <a href="${job.Link || '#'}" target="_blank" class="job-card__btn">View & Apply</a>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ---- Filters -----------------------------------------------
+function applyFilters() {
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  const type   = document.getElementById('filterType').value;
+
+  const filtered = allJobs.filter(job => {
+    const matchSearch = !search ||
+      (job.Title    || '').toLowerCase().includes(search) ||
+      (job.School   || '').toLowerCase().includes(search) ||
+      (job.Location || '').toLowerCase().includes(search);
+
+    const matchType = !type || job.Type === type;
+
+    return matchSearch && matchType;
+  });
+
+  if (filtered.length === 0) {
+    showState('empty');
+  } else {
+    showState('results', filtered.length);
+    renderCards(filtered);
+  }
+}
+
+document.getElementById('filterSearch').addEventListener('input',  applyFilters);
+document.getElementById('filterType').addEventListener('change', applyFilters);
+
+// ---- Fetch -------------------------------------------------
+async function loadJobs() {
+  showState('loading');
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('Network error');
+    const raw  = await res.text();
+    allJobs    = parseGviz(raw).filter(job => job.Title);
+
+    if (allJobs.length === 0) {
+      showState('empty');
+    } else {
+      showState('results', allJobs.length);
+      renderCards(allJobs);
+    }
+  } catch (err) {
+    console.error(err);
+    showState('error');
+  }
+}
+
+loadJobs();
 
   
 
