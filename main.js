@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
-  // Fermeture au clic sur l'overlay (hors modal)
+  // Fermeture au clic sur l'overlay
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeModal(overlay);
@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const cvModal    = document.getElementById('cvModal');
   const closeCvBtn = document.getElementById('closeCvModal');
 
-  // Tous les boutons qui ouvrent le modal CV
   document.querySelectorAll('#openCvForm, #openCvFormVacancies').forEach(btn => {
     btn?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -68,23 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   // MODAL — Job Detail
   // ============================================================
-  const jobModal      = document.getElementById('jobModal');
-  const closeJobBtn   = document.getElementById('closeJobModal');
-  const openApplyBtn  = document.getElementById('openApplyForm');
+  const jobModal    = document.getElementById('jobModal');
+  const closeJobBtn = document.getElementById('closeJobModal');
+  const openApplyBtn = document.getElementById('openApplyForm');
 
   closeJobBtn?.addEventListener('click', () => closeModal(jobModal));
 
   // ============================================================
   // MODAL — Apply Form
   // ============================================================
-  const applyModal      = document.getElementById('applyModal');
-  const closeApplyBtn   = document.getElementById('closeApplyModal');
+  const applyModal    = document.getElementById('applyModal');
+  const closeApplyBtn = document.getElementById('closeApplyModal');
 
   closeApplyBtn?.addEventListener('click', () => closeModal(applyModal));
 
-  // Bouton "Apply for this position" dans le modal JD
   openApplyBtn?.addEventListener('click', () => {
-    // On récupère le titre du job déjà affiché dans le modal JD
     const jobTitle = document.getElementById('jobModalTitle').textContent;
     document.getElementById('applyModalTitle').textContent    = `Apply — ${jobTitle}`;
     document.getElementById('applyModalSubtitle').textContent = jobTitle;
@@ -97,23 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   const counter = document.getElementById('vacanciesCount');
 
-  // On cache tout au départ
-  ['vacanciesLoading', 'vacanciesEmpty', 'vacanciesError'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('is-visible');
-  });
-  document.getElementById('jobsGrid').style.display = 'none';
-  document.getElementById('vacanciesFilters').style.display = 'none';
-
   function showState(state, count = 0) {
     // Reset tous les états
     ['vacanciesLoading', 'vacanciesEmpty', 'vacanciesError'].forEach(id => {
-      document.getElementById(id)?.classList.remove('is-visible');
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('is-visible');
     });
-    document.getElementById('jobsGrid').style.display        = 'none';
-    document.getElementById('vacanciesFilters').style.display = 'none';
-    counter.className = 'vacancies__count';
-    counter.textContent = '';
+
+    const grid    = document.getElementById('jobsGrid');
+    const filters = document.getElementById('vacanciesFilters');
+
+    grid.style.display    = 'none';
+    filters.style.display = 'none';
+    counter.className     = 'vacancies__count';
+    counter.textContent   = '';
 
     if (state === 'loading') {
       document.getElementById('vacanciesLoading').classList.add('is-visible');
@@ -127,8 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('vacanciesError').classList.add('is-visible');
 
     } else if (state === 'results') {
-      document.getElementById('jobsGrid').style.display        = 'grid';
-      document.getElementById('vacanciesFilters').style.display = 'flex';
+      grid.style.display    = 'grid';
+      filters.style.display = 'flex';
       counter.classList.add('is-green');
       counter.textContent = `${count} open position${count !== 1 ? 's' : ''}`;
     }
@@ -139,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   function parseGviz(raw) {
     const json = JSON.parse(
-      raw.match(/google\.visualization\.Query\.setResponse$ ([\s\S]*?) $ ;/)[1]
+      raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]
     );
     const rows = json.table.rows;
     if (!rows || rows.length < 2) return [];
@@ -189,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // Clic sur la card → ouvre le modal JD
       const openDetail = () => openJobModal(job);
       card.addEventListener('click', openDetail);
       card.addEventListener('keydown', (e) => {
@@ -204,4 +197,104 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // VACANCIES — O
+  // VACANCIES — Ouvre le modal JD
+  // ============================================================
+  function openJobModal(job) {
+    document.getElementById('jd-type').textContent    = job.Type    || '';
+    document.getElementById('jd-subject').textContent = job.Subject || '';
+    document.getElementById('jobModalTitle').textContent = job.Title || 'Position';
+
+    document.querySelector('#jd-location span').textContent = job.Location || '';
+    document.querySelector('#jd-salary span').textContent   = job.Salary   || '';
+    document.querySelector('#jd-date span').textContent     = job.Start    || job.Date_posted || '';
+
+    document.getElementById('jd-description').innerHTML  = formatJobText(job.Description   || '');
+    document.getElementById('jd-requirements').innerHTML = formatJobText(job.Requirements  || '');
+
+    jobModal.dataset.jobTitle    = job.Title    || '';
+    jobModal.dataset.jobId       = job.id       || job.ID || '';
+    jobModal.dataset.jobSchool   = job.School   || '';
+    jobModal.dataset.jobLocation = job.Location || '';
+
+    openModal(jobModal);
+  }
+
+  // Formate le texte brut en HTML
+  function formatJobText(text) {
+    if (!text) return '<p>—</p>';
+    if (/<[a-z][\s\S]*>/i.test(text)) return text;
+
+    const lines = text.split('\n').filter(l => l.trim());
+    const isList = lines.every(l => /^[-•*]/.test(l.trim()));
+
+    if (isList) {
+      const items = lines
+        .map(l => `<li>${l.replace(/^[-•*]\s*/, '').trim()}</li>`)
+        .join('');
+      return `<ul>${items}</ul>`;
+    }
+
+    return lines.map(l => `<p>${l.trim()}</p>`).join('');
+  }
+
+  // ============================================================
+  // VACANCIES — Filtres
+  // ============================================================
+  let allJobs = [];
+
+  function applyFilters() {
+    const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
+    const type   =  document.getElementById('filterType')?.value   || '';
+
+    const filtered = allJobs.filter(job => {
+      const matchSearch =
+        !search ||
+        (job.Title    || '').toLowerCase().includes(search) ||
+        (job.School   || '').toLowerCase().includes(search) ||
+        (job.Location || '').toLowerCase().includes(search) ||
+        (job.Subject  || '').toLowerCase().includes(search);
+
+      const matchType = !type || job.Type === type;
+
+      return matchSearch && matchType;
+    });
+
+    renderCards(filtered);
+
+    counter.textContent = `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`;
+    counter.className   = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
+  }
+
+  document.getElementById('filterSearch')?.addEventListener('input',  applyFilters);
+  document.getElementById('filterType')?.addEventListener('change', applyFilters);
+
+  // ============================================================
+  // VACANCIES — Fetch Google Sheet
+  // ============================================================
+  async function loadJobs() {
+    showState('loading');
+    try {
+      const res = await fetch(SHEET_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const raw = await res.text();
+      allJobs   = parseGviz(raw).filter(job => job.Title && job.Status !== 'inactive');
+
+      if (allJobs.length === 0) {
+        showState('empty');
+      } else {
+        showState('results', allJobs.length);
+        renderCards(allJobs);
+      }
+    } catch (err) {
+      console.error('[VS Recruitment] Failed to load jobs:', err);
+      showState('error');
+    }
+  }
+
+  document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
+
+  // Lance le chargement
+  loadJobs();
+
+}); // fin DOMContentLoaded
