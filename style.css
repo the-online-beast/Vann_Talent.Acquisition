@@ -616,6 +616,26 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 /* ============================================================
+   VACANCIES — Compteur de postes
+============================================================ */
+.vacancies__count {
+  font-size: 0.82rem;
+  margin-top: 6px;
+  min-height: 1.2em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.vacancies__count.is-green {
+  color: #2d6a4f;
+}
+
+.vacancies__count.is-red {
+  color: #b94040;
+}
+
+
+/* ============================================================
    JOBS GRID
 ============================================================ */
 .jobs-grid {
