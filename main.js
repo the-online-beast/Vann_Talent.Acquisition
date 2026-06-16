@@ -94,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function parseGviz(raw) {
     const json = JSON.parse(raw.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
     const cols = json.table.cols.map(c => c.label);
+    console.log('COLS:', cols);          // <-- ajoute ça
+    console.log('ROWS:', json.table.rows); // <-- et ça
     const rows = json.table.rows;
     return rows.map(row => {
       const job = {};
@@ -103,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return job;
     });
   }
+
 
   function renderCards(jobs) {
     const grid = document.getElementById('jobsGrid');
