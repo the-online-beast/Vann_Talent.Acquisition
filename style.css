@@ -886,3 +886,113 @@ button { cursor: pointer; font-family: inherit; }
   }
 }
 
+/* ============================================================
+   JOB CARD — Compléments
+============================================================ */
+.job-card__tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.job-card__details {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.job-card__footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.job-card__cta {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: color 0.2s;
+}
+
+.job-card:hover .job-card__cta {
+  color: var(--color-accent);
+}
+
+/* ============================================================
+   FILTERS — Input & Select
+============================================================ */
+.filter-input,
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: var(--font-main);
+  font-size: 0.84rem;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  border-color: var(--color-accent);
+}
+
+/* ============================================================
+   JOB DETAIL — Text formatting
+============================================================ */
+.job-detail__text p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.job-detail__text ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+}
+
+.job-detail__text ul li {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  padding-left: 16px;
+  position: relative;
+}
+
+.job-detail__text ul li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+}
+
+/* ============================================================
+   JOB DETAIL — Footer
+============================================================ */
+.job-detail__footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.job-detail__footer-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+
