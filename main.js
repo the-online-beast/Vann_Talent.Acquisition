@@ -1,6 +1,8 @@
+
 // ============================================================
 // NAVBAR — Burger menu
 // ============================================================
+document.addEventListener('DOMContentLoaded', () => {
 const burgerBtn   = document.getElementById('burgerBtn');
 const mobileMenu  = document.getElementById('mobileMenu');
 
@@ -180,6 +182,7 @@ async function loadJobs() {
 }
 
 loadJobs();
+  });
 
   
 
