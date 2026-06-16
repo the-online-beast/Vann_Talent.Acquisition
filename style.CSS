@@ -1,0 +1,512 @@
+/* ============================================================
+   DESIGN SYSTEM — Variables
+============================================================ */
+:root {
+  --color-bg:         #F8F7F4;
+  --color-surface:    #FFFFFF;
+  --color-border:     #E4E1D9;
+  --color-text:       #1A1A1A;
+  --color-text-muted: #6B6760;
+  --color-accent:     #1B2A4A;
+  --color-accent-hover: #243761;
+  --color-tag-bg:     #EEF0F5;
+  --color-tag-text:   #1B2A4A;
+
+  --font-main: 'Inter', sans-serif;
+
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  14px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.09);
+
+  --nav-height: 60px;
+  --container-max: 1080px;
+  --container-pad: 24px;
+}
+
+/* ============================================================
+   RESET
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ============================================================
+   LAYOUT HELPERS
+============================================================ */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.section {
+  padding: 80px 0;
+}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  height: var(--nav-height);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+}
+
+.navbar__brand {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+}
+
+.navbar__links {
+  display: flex;
+  gap: 32px;
+}
+
+.navbar__links a {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  transition: color 0.2s;
+}
+
+.navbar__links a:hover {
+  color: var(--color-text);
+}
+
+/* Burger — hidden on desktop */
+.navbar__burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+.navbar__burger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+/* Mobile menu */
+.navbar__mobile {
+  display: none;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 12px var(--container-pad);
+  gap: 0;
+}
+
+.navbar__mobile.is-open {
+  display: flex;
+}
+
+.mobile-link {
+  padding: 12px 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  transition: color 0.2s;
+}
+
+.mobile-link:last-child { border-bottom: none; }
+.mobile-link:hover { color: var(--color-text); }
+
+/* ============================================================
+   SECTION 1 — ABOUT
+============================================================ */
+.about {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.about__grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* --- Identity column --- */
+.about__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  position: sticky;
+  top: calc(var(--nav-height) + 24px);
+}
+
+.about__photo-wrap {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  background: var(--color-tag-bg);
+  margin-bottom: 4px;
+  position: relative;
+}
+
+.about__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__photo-fallback {
+  display: none;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-tag-bg);
+}
+
+.about__name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.about__role {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.about__location {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.about__linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--color-accent);
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.about__linkedin:hover {
+  background: var(--color-tag-bg);
+  border-color: var(--color-accent);
+}
+
+/* --- Content column --- */
+.about__content {
+  padding-top: 8px;
+}
+
+.about__tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-tag-text);
+  background: var(--color-tag-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.about__heading {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text);
+  margin-bottom: 24px;
+}
+
+.about__bio {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.about__bio p {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+}
+
+/* --- CTA Cards --- */
+.about__ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cta-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+}
+
+.cta-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.cta-card--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.cta-card--primary .cta-card__icon,
+.cta-card--primary h3,
+.cta-card--primary p {
+  color: rgba(255,255,255,0.9);
+}
+
+.cta-card--secondary {
+  background: var(--color-surface);
+}
+
+.cta-card__icon {
+  flex-shrink: 0;
+  color: var(--color-accent);
+  margin-top: 2px;
+}
+
+.cta-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cta-card__body h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.cta-card__body p {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.btn {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-main);
+  white-space: nowrap;
+}
+
+.btn--dark {
+  background: var(--color-surface);
+  color: var(--color-accent);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.btn--dark:hover {
+  background: rgba(255,255,255,0.85);
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.btn--outline:hover {
+  background: var(--color-tag-bg);
+}
+
+.btn--solid {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+.btn--solid:hover {
+  background: var(--color-accent-hover);
+}
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.is-open {
+  display: flex;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: var(--shadow-md);
+}
+
+.modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.modal__close:hover {
+  background: var(--color-tag-bg);
+  color: var(--color-text);
+}
+
+.modal__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.modal__subtitle {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.modal__placeholder {
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   PLACEHOLDERS (sections à venir)
+============================================================ */
+.placeholder-text {
+  text-align: center;
+  color: var(--color-border);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  padding: 40px 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .navbar__links { display: none; }
+  .navbar__burger { display: flex; }
+  .navbar { height: auto; min-height: var(--nav-height); }
+  .navbar__inner { height: var(--nav-height); }
+
+  .about__grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about__identity {
+    position: static;
+  }
+
+  .about__heading {
+    font-size: 1.5rem;
+  }
+
+  .about__ctas {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 24px;
+  }
+
+  .cta-card {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
