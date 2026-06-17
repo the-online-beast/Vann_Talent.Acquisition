@@ -52,17 +52,164 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   // MODAL — CV Form
   // ============================================================
-  const cvModal    = document.getElementById('cvModal');
-  const closeCvBtn = document.getElementById('closeCvModal');
+  // ============================================================
+// CV FORM — Submit
+// ============================================================
+const CV_WEBHOOK = 'https://n8n.strength-os.tech/webhook/fc310eee-adce-486e-913b-8e5b6e48f24f';
 
-  document.querySelectorAll('#openCvForm, #openCvFormVacancies').forEach(btn => {
-    btn?.addEventListener('click', (e) => {
-      e.preventDefault();
-      openModal(cvModal);
-    });
+const cvForm        = document.getElementById('cvForm');
+const cvSubmitBtn   = document.getElementById('cvSubmitBtn');
+const cvBtnText     = document.getElementById('cvBtnText');
+const cvBtnSpinner  = document.getElementById('cvBtnSpinner');
+const cvFormState   = document.getElementById('cvFormState');
+const cvSuccessState = document.getElementById('cvSuccessState');
+const cvErrorState  = document.getElementById('cvErrorState');
+
+// --- File input ---
+const fileInput   = document.getElementById('cv-file');
+const fileDrop    = document.getElementById('fileDrop');
+const fileDropUI  = document.getElementById('fileDropUI');
+const filePreview = document.getElementById('filePreview');
+const fileNameEl  = document.getElementById('fileName');
+const removeFile  = document.getElementById('removeFile');
+
+function showFile(file) {
+  fileNameEl.textContent = file.name;
+  fileDropUI.style.display = 'none';
+  filePreview.style.display = 'flex';
+  fileDrop.classList.add('has-file');
+}
+
+function clearFile() {
+  fileInput.value = '';
+  fileDropUI.style.display = 'flex';
+  filePreview.style.display = 'none';
+  fileDrop.classList.remove('has-file');
+}
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) showFile(fileInput.files[0]);
+});
+
+removeFile.addEventListener('click', clearFile);
+
+// Drag & drop
+fileDrop.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  fileDrop.classList.add('is-dragging');
+});
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('is-dragging'));
+fileDrop.addEventListener('drop', (e) => {
+  e.preventDefault();
+  fileDrop.classList.remove('is-dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    showFile(file);
+  }
+});
+
+// --- Validation ---
+function validateCvForm() {
+  let valid = true;
+
+  const name = document.getElementById('cv-name');
+  const email = document.getElementById('cv-email');
+  const position = document.getElementById('cv-position');
+  const file = fileInput;
+
+  document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+
+  if (!name.value.trim()) {
+    document.getElementById('err-name').textContent = 'Required';
+    valid = false;
+  }
+  if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    document.getElementById('err-email').textContent = 'Valid email required';
+    valid = false;
+  }
+  if (!position.value.trim()) {
+    document.getElementById('err-position').textContent = 'Required';
+    valid = false;
+  }
+  if (!file.files[0]) {
+    document.getElementById('err-file').textContent = 'Please attach your CV';
+    valid = false;
+  } else if (file.files[0].size > 5 * 1024 * 1024) {
+    document.getElementById('err-file').textContent = 'File too large (max 5 MB)';
+    valid = false;
+  }
+
+  return valid;
+}
+
+// --- Submit ---
+if (cvForm) {
+  cvForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateCvForm()) return;
+
+    // Loading state
+    cvBtnText.style.display = 'none';
+    cvBtnSpinner.style.display = 'inline-block';
+    cvSubmitBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('fullName',    document.getElementById('cv-name').value.trim());
+    formData.append('email',       document.getElementById('cv-email').value.trim());
+    formData.append('phone',       document.getElementById('cv-phone').value.trim());
+    formData.append('location',    document.getElementById('cv-location').value.trim());
+    formData.append('position',    document.getElementById('cv-position').value.trim());
+    formData.append('subject',     document.getElementById('cv-subject').value);
+    formData.append('experience',  document.getElementById('cv-experience').value);
+    formData.append('availability',document.getElementById('cv-availability').value);
+    formData.append('coverNote',   document.getElementById('cv-note').value.trim());
+    formData.append('cv',          fileInput.files[0]);
+
+    try {
+      const res = await fetch(CV_WEBHOOK, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Webhook error');
+
+      // Succès
+      cvFormState.style.display = 'none';
+      cvSuccessState.style.display = 'flex';
+
+    } catch (err) {
+      console.error(err);
+      cvFormState.style.display = 'none';
+      cvErrorState.style.display = 'flex';
+    } finally {
+      cvBtnText.style.display = 'inline';
+      cvBtnSpinner.style.display = 'none';
+      cvSubmitBtn.disabled = false;
+    }
   });
+}
 
-  closeCvBtn?.addEventListener('click', () => closeModal(cvModal));
+// Retry
+document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
+  cvErrorState.style.display = 'none';
+  cvFormState.style.display = 'block';
+});
+
+// Success close
+document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
+  cvModal.classList.remove('is-open');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    cvSuccessState.style.display = 'none';
+    cvFormState.style.display = 'block';
+    cvForm.reset();
+    clearFile();
+  }, 300);
+});
+
 
   // ============================================================
   // MODAL — Job Detail
