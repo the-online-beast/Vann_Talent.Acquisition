@@ -304,16 +304,139 @@
        MODAL — CV FORM (structure, logique n8n à venir étape 4)
   ============================================================ -->
   <div class="modal-overlay" id="cvModal" role="dialog" aria-modal="true" aria-labelledby="cvModalTitle">
-    <div class="modal">
-      <button class="modal__close" id="closeCvModal" aria-label="Close">✕</button>
+  <div class="modal modal--large">
+    <button class="modal__close" id="closeCvModal" aria-label="Close">✕</button>
+
+    <!-- État : Formulaire -->
+    <div id="cvFormState">
       <h2 class="modal__title" id="cvModalTitle">Submit your CV</h2>
-      <p class="modal__subtitle">I will review your profile and get in touch when a relevant role comes up.</p>
-      <!-- Formulaire CV — sera complété à l'étape 4 -->
-      <div class="modal__placeholder">
-        <p>CV form will be connected to n8n in step 4.</p>
-      </div>
+      <p class="modal__subtitle">
+        I will review your profile and get in touch when a relevant role comes up.
+      </p>
+
+      <form id="cvForm" class="cv-form" novalidate>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-name">Full Name <span class="required">*</span></label>
+            <input type="text" id="cv-name" name="fullName" placeholder="Jane Smith" required />
+            <span class="form-error" id="err-name"></span>
+          </div>
+          <div class="form-group">
+            <label for="cv-email">Email Address <span class="required">*</span></label>
+            <input type="email" id="cv-email" name="email" placeholder="jane@email.com" required />
+            <span class="form-error" id="err-email"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-phone">Phone Number</label>
+            <input type="text" id="cv-phone" name="phone" placeholder="+60 12 345 6789" />
+          </div>
+          <div class="form-group">
+            <label for="cv-location">Current Location</label>
+            <input type="text" id="cv-location" name="location" placeholder="Kuala Lumpur" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-position">Position Sought <span class="required">*</span></label>
+            <input type="text" id="cv-position" name="position" placeholder="English Teacher" required />
+            <span class="form-error" id="err-position"></span>
+          </div>
+          <div class="form-group">
+            <label for="cv-subject">Subject Area</label>
+            <select id="cv-subject" name="subject">
+              <option value="">— Select —</option>
+              <option>English</option>
+              <option>Mathematics</option>
+              <option>Sciences</option>
+              <option>Humanities</option>
+              <option>Arts</option>
+              <option>Physical Education</option>
+              <option>ICT / Computing</option>
+              <option>Early Childhood</option>
+              <option>Special Education Needs</option>
+              <option>School Administration</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-experience">Years of Experience</label>
+            <input type="number" id="cv-experience" name="experience" min="0" max="50" placeholder="3" />
+          </div>
+          <div class="form-group">
+            <label for="cv-availability">Availability</label>
+            <select id="cv-availability" name="availability">
+              <option value="">— Select —</option>
+              <option>Immediately</option>
+              <option>Within 1 month</option>
+              <option>1–3 months</option>
+              <option>More than 3 months</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cv-note">Cover Note</label>
+          <textarea id="cv-note" name="coverNote" rows="3"
+            placeholder="Brief intro — who you are, what you are looking for…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="cv-file">Upload your CV <span class="required">*</span></label>
+          <div class="file-drop" id="fileDrop">
+            <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" required />
+            <div class="file-drop__ui" id="fileDropUI">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.8" width="28" height="28">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p>Drag & drop or <span class="file-drop__link">browse</span></p>
+              <p class="file-drop__hint">PDF, DOC or DOCX — max 5 MB</p>
+            </div>
+            <div class="file-drop__preview" id="filePreview" style="display:none">
+              <span id="fileName"></span>
+              <button type="button" class="file-drop__remove" id="removeFile">✕</button>
+            </div>
+          </div>
+          <span class="form-error" id="err-file"></span>
+        </div>
+
+        <button type="submit" class="btn btn--solid btn--full" id="cvSubmitBtn">
+          <span id="cvBtnText">Send my profile</span>
+          <span id="cvBtnSpinner" class="btn-spinner" style="display:none"></span>
+        </button>
+
+      </form>
     </div>
+
+    <!-- État : Succès -->
+    <div id="cvSuccessState" style="display:none" class="modal__success">
+      <div class="success-icon">✓</div>
+      <h3>Profile received!</h3>
+      <p>Thank you — I will review your CV and be in touch within 24 hours.</p>
+      <button class="btn btn--outline" id="cvSuccessClose">Close</button>
+    </div>
+
+    <!-- État : Erreur -->
+    <div id="cvErrorState" style="display:none" class="modal__error">
+      <div class="error-icon">!</div>
+      <h3>Something went wrong</h3>
+      <p>Please try again or contact me directly on LinkedIn.</p>
+      <button class="btn btn--outline" id="cvRetryBtn">Try again</button>
+    </div>
+
   </div>
+</div>
+
 
   
 
