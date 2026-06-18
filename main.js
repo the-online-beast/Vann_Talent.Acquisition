@@ -646,7 +646,6 @@ async function loadJobs() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const raw = await res.text();
-      allJobs = parseGviz(raw).filter(job => job.Title && job.Status !== 'inactive');
 
       if (allJobs.length === 0) {
         showState('empty');
