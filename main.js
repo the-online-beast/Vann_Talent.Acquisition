@@ -283,8 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
         // File Upload Handler
-      const fileUpload = document.getElementById('fileUpload');
-      const fileInput = document.getElementById('applyCV');
+
 
       if (fileUpload && fileInput) {
         // Click to upload
