@@ -188,37 +188,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ============================================================
+    // ============================================================
   // VACANCIES — Job detail modal
   // ============================================================
   const jobModal = document.getElementById('jobModal');
 
   function openJobModal(job) {
-    document.getElementById('jd-type').textContent        = job['Job Type'] || '';
-    document.getElementById('jd-subject').textContent    = '';
-    document.getElementById('jobModalTitle').textContent  = job.Title || 'Position';
+    document.getElementById('jd-type').textContent       = job['Job Type'] || job.Type || '';
+    document.getElementById('jobModalTitle').textContent = job.Title || 'Position';
 
-    const locationEl = document.querySelector('#jd-location span');
-    if (locationEl) locationEl.textContent = [job.City, job.District].filter(Boolean).join(', ') || job.Location || '';
+    document.querySelector('#jd-location span').textContent = job.Location || '';
+    document.querySelector('#jd-salary span').textContent   = job.Salary   || '';
+    document.querySelector('#jd-date span').textContent     = job.Start    || job.Date_posted || '';
 
-    const salaryEl = document.querySelector('#jd-salary span');
-    if (salaryEl) salaryEl.textContent = job['Annual base salary'] || job.Salary || '';
+    const schoolEl   = document.getElementById('jd-school');
+    const districtEl = document.getElementById('jd-district');
+    if (schoolEl)   schoolEl.textContent   = job.School   || '';
+    if (districtEl) districtEl.textContent = job.District || '';
 
-    const dateEl = document.querySelector('#jd-date span');
-    if (dateEl) dateEl.textContent = job.Date_posted || job['Date Posted'] || '';
-
-    document.getElementById('jd-school').innerHTML    = job.School    ? `<strong>School:</strong> ${job.School}` : '';
-    document.getElementById('jd-district').innerHTML  = job.District  ? `<strong>District:</strong> ${job.District}` : '';
-    document.getElementById('jd-description').innerHTML   = formatJobText(job['Long Description'] || job.Description || '');
+    document.getElementById('jd-description').innerHTML  = formatJobText(job.Description  || '');
     document.getElementById('jd-requirements').innerHTML = formatJobText(job.Requirements || '');
 
     jobModal.dataset.jobTitle    = job.Title    || '';
+    jobModal.dataset.jobId       = job.id       || job.ID || '';
     jobModal.dataset.jobSchool   = job.School   || '';
-    jobModal.dataset.jobCity     = job.City     || '';
-    jobModal.dataset.jobSalary   = job['Annual base salary'] || '';
+    jobModal.dataset.jobLocation = job.Location || '';
 
     openModal(jobModal);
   }
+
 
   function formatJobText(text) {
     if (!text) return '<p>—</p>';
