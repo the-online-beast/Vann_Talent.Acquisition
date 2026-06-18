@@ -613,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('filterSearch')?.addEventListener('input', applyFilters);
   document.getElementById('filterType')?.addEventListener('change', applyFilters);
 
-  // ============================================================
+   // ============================================================
   // VACANCIES — Load Jobs from Google Sheet
   // ============================================================
   async function loadJobs() {
@@ -638,6 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showState('error');
     }
   }
+
 
   document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
 
