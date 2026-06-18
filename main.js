@@ -639,26 +639,29 @@ async function loadJobs() {
   // VACANCIES — Load Jobs from Google Sheet
   // ============================================================
   async function loadJobs() {
-    showState('loading');
-    try {
-      const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShPwLyNkrFmUkec8htH_XDfdE3XnNhyGBNlAC3ex8fxfViGYSl06QfGIG3AY96GCfoNggDfxxl0ROn/pub?output=csv';
-      
-      const res = await fetch(SHEET_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  showState('loading');
+  try {
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShPwLyNkrFmUkec8htH_XDfdE3XnNhyGBNlAC3ex8fxfViGYSl06QfGIG3AY96GCfoNggDfxxl0ROn/pub?output=csv';
+    
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const raw = await res.text();
+    const csv = await res.text();
+    // ✅ Enlève le filtre sur Status si la colonne n'existe pas
+    allJobs = parseCSV(csv).filter(job => job.Title && job.Title.trim() !== '');
 
-      if (allJobs.length === 0) {
-        showState('empty');
-      } else {
-        showState('results', allJobs.length);
-        renderCards(allJobs);
-      }
-    } catch (err) {
-      console.error('[VS Recruitment] Failed to load jobs:', err);
-      showState('error');
+    if (allJobs.length === 0) {
+      showState('empty');
+    } else {
+      showState('results', allJobs.length);
+      renderCards(allJobs);
     }
+  } catch (err) {
+    console.error('[VS Recruitment] Failed to load jobs:', err);
+    showState('error');
   }
+}
+
 
 
   document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
