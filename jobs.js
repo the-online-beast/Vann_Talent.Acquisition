@@ -24,6 +24,6 @@ const SHEET_VACANCIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRU
 
 const SHEET_CANDIDATES_URL = 'https://docs.google.com/spreadsheets/d/1ZPuAG5ymp1SD_GcKRias41eynwzdfS6MNdGV6BrNSHI/edit';
 
-const CV_WEBHOOK    = '';
-const APPLY_WEBHOOK = '';
-const DRIVE_FOLDER  = '';
+const CV_WEBHOOK    = 'https://n8n.strength-os.tech/webhook/fc310eee-adce-486e-913b-8e5b6e48f24f';
+const APPLY_WEBHOOK = 'https://n8n.strength-os.tech/webhook/apply';
+const DRIVE_FOLDER  = 'https://drive.google.com/drive/folders/15qYwk0SJC-K3pWNdoOV-bR7f7qNjacza';
