@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadJobs() {
     showState('loading');
     try {
-      const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRMb2j_VmjvFLEEu2D-qDMf5ZhSLOREJFR0PK8sQV5bfaHfqzx7F8QLbDTFRCWANZw7D0LyH-2Nqhk8/gviz/tq?tqx=out:json';
+      const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/1vE-EIMhnGogl06y88CRh0Fu3mt6IGBWUthgPAeJHj8A/gviz/tq?tqx=out:json';
       
       const res = await fetch(SHEET_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
