@@ -500,7 +500,8 @@ async function loadJobs() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const csv = await res.text();
-    allJobs = parseCSV(csv).filter(job => job.Title && job.Title.trim() !== '' && job.Status !== 'inactive');
+    // ✅ Enlève le filtre sur Status si la colonne n'existe pas
+    allJobs = parseCSV(csv).filter(job => job.Title && job.Title.trim() !== '');
 
     if (allJobs.length === 0) {
       showState('empty');
