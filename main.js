@@ -45,12 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fermeture avec Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      document.querySelectorAll('.modal-overlay.is-open').forEach(m => closeModal(m));
+      document.querySelectorAll('.-overlay.is-open').forEach(m => close(m));
     }
   });
 
   // ============================================================
-  // MODAL — CV Form
+  //  — CV Form
   // ============================================================
   // ============================================================
 // CV FORM — Submit
@@ -200,7 +200,7 @@ document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
 
 // Success close
 document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
-  cvModal.classList.remove('is-open');
+  cv.classList.remove('is-open');
   document.body.style.overflow = '';
   setTimeout(() => {
     cvSuccessState.style.display = 'none';
@@ -212,18 +212,18 @@ document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
 
 
   // ============================================================
-  // MODAL — Job Detail
+  //  — Job Detail
   // ============================================================
-  const jobModal    = document.getElementById('jobModal');
-  const closeJobBtn = document.getElementById('closeJobModal');
+  const job    = document.getElementById('job');
+  const closeJobBtn = document.getElementById('closeJob');
   const openApplyBtn = document.getElementById('openApplyForm');
 
-  closeJobBtn?.addEventListener('click', () => closeModal(jobModal));
+  closeJobBtn?.addEventListener('click', () => close(job));
 
   // ============================================================
-  // MODAL — Apply Form
+  //  — Apply Form
   // ============================================================
-  const applyModal    = document.getElementById('applyModal');
+  const apply    = document.getElementById('applyModal');
   const closeApplyBtn = document.getElementById('closeApplyModal');
 
   closeApplyBtn?.addEventListener('click', () => closeModal(applyModal));
@@ -235,6 +235,162 @@ document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
     closeModal(jobModal);
     openModal(applyModal);
   });
+
+  // ============================================================
+// APPLY FORM — Validation & Submission
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const applyForm = document.getElementById('applyForm');
+  const applyModal = document.getElementById('applyModal');
+  const closeApplyModal = document.getElementById('closeApplyModal');
+  const openApplyForm = document.getElementById('openApplyForm');
+  const otherCitiesRow = document.getElementById('otherCitiesRow');
+  const fileUpload = document.querySelector('.file-upload');
+  const fileInput = document.getElementById('applyCV');
+  const formStatus = document.getElementById('formStatus');
+
+  // ---- Open Apply Modal ----
+  if (openApplyForm) {
+    openApplyForm.addEventListener('click', (e) => {
+      e.preventDefault();
+      const jobTitle = document.getElementById('jobModalTitle')?.textContent || 'Position';
+      document.getElementById('applyModalSubtitle').textContent = `For: ${jobTitle}`;
+      applyModal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    });
+  }
+
+  // ---- Close Apply Modal ----
+  if (closeApplyModal) {
+    closeApplyModal.addEventListener('click', () => {
+      applyModal.classList.remove('is-open');
+      document.body.style.overflow = '';
+      applyForm.reset();
+      formStatus.style.display = 'none';
+      fileUpload.classList.remove('has-file');
+    });
+  }
+
+  // ---- Show/Hide "Other Cities" field ----
+  document.querySelectorAll('input[name="locations"]').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const hasOther = Array.from(document.querySelectorAll('input[name="locations"]:checked'))
+        .some(cb => cb.value === 'Other');
+      otherCitiesRow.style.display = hasOther ? 'grid' : 'none';
+    });
+  });
+
+  // ---- File Upload Handler ----
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showFormStatus('File size exceeds 5MB. Please upload a smaller file.', 'error');
+        fileInput.value = '';
+        fileUpload.classList.remove('has-file');
+      } else {
+        fileUpload.classList.add('has-file');
+      }
+    }
+  });
+
+  // ---- Languages Validation (at least one) ----
+  function validateLanguages() {
+    const checked = Array.from(document.querySelectorAll('input[name="languages"]:checked')).length > 0;
+    const error = document.getElementById('languagesError');
+    if (!checked) {
+      error.textContent = 'Please select at least one language';
+      error.classList.add('show');
+      return false;
+    } else {
+      error.classList.remove('show');
+      return true;
+    }
+  }
+
+  // ---- Locations Validation (at least one) ----
+  function validateLocations() {
+    const checked = Array.from(document.querySelectorAll('input[name="locations"]:checked')).length > 0;
+    const error = document.getElementById('locationsError');
+    if (!checked) {
+      error.textContent = 'Please select at least one location';
+      error.classList.add('show');
+      return false;
+    } else {
+      error.classList.remove('show');
+      return true;
+    }
+  }
+
+  // ---- Form Submission ----
+  applyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (!validateLanguages() || !validateLocations()) {
+      return;
+    }
+
+    // Collect form data
+    const formData = new FormData(applyForm);
+
+    // Combine languages into string
+    const languages = Array.from(document.querySelectorAll('input[name="languages"]:checked'))
+      .map(cb => cb.value)
+      .join(', ');
+    formData.set('languages', languages);
+
+    // Combine locations into string
+    const locations = Array.from(document.querySelectorAll('input[name="locations"]:checked'))
+      .map(cb => cb.value)
+      .join(', ');
+    formData.set('locations', locations);
+
+    // Show loading state
+    const submitBtn = document.getElementById('applySubmitBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    try {
+      // Replace with your actual n8n webhook URL
+      const response = await fetch('https://n8n.strength-os.tech/webhook/apply', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        showFormStatus('✓ Application submitted successfully! I will review your profile and contact you within 48 hours.', 'success');
+        applyForm.reset();
+        fileUpload.classList.remove('has-file');
+        setTimeout(() => {
+          applyModal.classList.remove('is-open');
+          document.body.style.overflow = '';
+        }, 2000);
+      } else {
+        showFormStatus('Something went wrong. Please try again or contact me directly.', 'error');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      showFormStatus('Network error. Please check your connection and try again.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
+  });
+
+  // ---- Show Form Status ----
+  function showFormStatus(message, type) {
+    formStatus.textContent = message;
+    formStatus.className = `form-status ${type}`;
+    formStatus.style.display = 'block';
+    formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+});
+
 
   // ============================================================
   // VACANCIES — États d'affichage
