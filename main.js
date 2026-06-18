@@ -1,18 +1,13 @@
 // ============================================================
-// main.js — Logique complète du site
+// main.js — Complete site logic
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Vérifie que config.js est chargé
-  if (typeof CONFIG === 'undefined') {
-    console.error('❌ config.js not loaded! Make sure it\'s included before main.js');
-    return;
-  }
 
   // ============================================================
   // NAVBAR — Burger menu
   // ============================================================
-  const burgerBtn = document.getElementById('burgerBtn');
+  const burgerBtn  = document.getElementById('burgerBtn');
   const mobileMenu = document.getElementById('mobileMenu');
 
   if (burgerBtn) {
@@ -28,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ============================================================
-  // UTILITAIRE — Gestion des modals
+  // MODAL UTILITY
   // ============================================================
   function openModal(modal) {
     modal.classList.add('is-open');
@@ -40,522 +35,613 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
-  // Fermeture au clic sur l'overlay
+  // Close on overlay click
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeModal(overlay);
     });
   });
 
-  // ============================================================
-  // CV FORM MODAL
-  // ============================================================
-  const cvModal = document.getElementById('cvModal');
-  const cvForm = document.getElementById('cvForm');
-  const cvFormState = document.getElementById('cvFormState');
-  const cvSuccessState = document.getElementById('cvSuccessState');
-  const cvErrorState = document.getElementById('cvErrorState');
-  const cvSubmitBtn = document.getElementById('cvSubmitBtn');
-  const cvBtnText = document.getElementById('cvBtnText');
-  const cvBtnSpinner = document.getElementById('cvBtnSpinner');
-  const openCvBtn = document.getElementById('openCvModal');
-  const closeCvBtn = document.getElementById('closeCvModal');
-  const cvFileInput = document.getElementById('cvFileInput');
-  const cvFileLabel = document.getElementById('cvFileLabel');
-  const cvFileUpload = document.getElementById('cvFileUpload');
-
-  if (openCvBtn) {
-    openCvBtn.addEventListener('click', () => openModal(cvModal));
-  }
-
-  if (closeCvBtn) {
-    closeCvBtn.addEventListener('click', () => closeModal(cvModal));
-  }
-
-  // File upload drag & drop
-  if (cvFileLabel) {
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      cvFileLabel.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
-
-    cvFileLabel.addEventListener('drop', (e) => {
-      const file = e.dataTransfer.files[0];
-      if (file) cvFileInput.files = e.dataTransfer.files;
-      updateFileDisplay(file, cvFileUpload, cvFileInput);
-    });
-
-    cvFileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      updateFileDisplay(file, cvFileUpload, cvFileInput);
-    });
-  }
-
-  function updateFileDisplay(file, fileUploadEl, fileInputEl) {
-    if (!file) return;
-
-    if (!file.type.includes('pdf') && !file.type.includes('word') && !file.type.includes('document')) {
-      alert('Please upload a PDF or Word document');
-      fileInputEl.value = '';
-      return;
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.is-open').forEach(m => closeModal(m));
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File must be smaller than 5MB');
-      fileInputEl.value = '';
-      return;
-    }
-
-    const label = fileUploadEl.querySelector('.file-upload__label');
-    label.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-      <p><strong>${file.name}</strong></p>
-      <p class="file-upload__hint">${(file.size / 1024 / 1024).toFixed(2)}MB</p>
-      <button type="button" class="file-upload__remove">Remove</button>
-    `;
-
-    label.querySelector('.file-upload__remove').addEventListener('click', (e) => {
-      e.preventDefault();
-      fileInputEl.value = '';
-      label.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p><strong>Click to upload</strong> or drag and drop</p>
-        <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
-      `;
-    });
-  }
-
-  // CV Form submission
-  if (cvForm) {
-    cvForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Validation
-      const name = document.getElementById('cv-name').value.trim();
-      const email = document.getElementById('cv-email').value.trim();
-      const phone = document.getElementById('cv-phone').value.trim();
-      const position = document.getElementById('cv-position').value.trim();
-      const subject = document.getElementById('cv-subject').value.trim();
-      const experience = document.getElementById('cv-experience').value;
-      const availability = document.getElementById('cv-availability').value;
-      const file = cvFileInput.files[0];
-
-      if (!name || !email || !phone || !position || !subject || !experience || !availability || !file) {
-        alert('Please fill all required fields');
-        return;
-      }
-
-      // Prépare FormData pour n8n
-      const formData = new FormData();
-      formData.append('fullName', name);
-      formData.append('email', email);
-      formData.append('phone', phone);
-      formData.append('location', document.getElementById('cv-location').value.trim());
-      formData.append('position', position);
-      formData.append('subject', subject);
-      formData.append('experience', experience);
-      formData.append('availability', availability);
-      formData.append('coverNote', document.getElementById('cv-note').value.trim());
-      formData.append('cv', file);
-
-      // Spinner
-      cvBtnText.style.display = 'none';
-      cvBtnSpinner.style.display = 'inline-block';
-      cvSubmitBtn.disabled = true;
-
-      try {
-        const res = await fetch(CONFIG.WEBHOOK_CV_FORM, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        // Succès
-        cvFormState.style.display = 'none';
-        cvSuccessState.style.display = 'flex';
-
-      } catch (err) {
-        console.error('CV submission error:', err);
-        cvFormState.style.display = 'none';
-        cvErrorState.style.display = 'flex';
-      } finally {
-        cvBtnText.style.display = 'inline';
-        cvBtnSpinner.style.display = 'none';
-        cvSubmitBtn.disabled = false;
-      }
-    });
-  }
-
-  // Retry
-  document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
-    cvErrorState.style.display = 'none';
-    cvFormState.style.display = 'block';
-  });
-
-  // Success close
-  document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
-    closeModal(cvModal);
-    setTimeout(() => {
-      cvSuccessState.style.display = 'none';
-      cvFormState.style.display = 'block';
-      cvForm.reset();
-      cvFileLabel.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p><strong>Click to upload</strong> or drag and drop</p>
-        <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
-      `;
-    }, 300);
   });
 
   // ============================================================
-  // JOB DETAIL & APPLY FORM
+  // VACANCIES — CSV Parser (handles quoted fields with commas)
   // ============================================================
-  const jobModal = document.getElementById('jobModal');
-  const applyModal = document.getElementById('applyModal');
-  const applyForm = document.getElementById('applyForm');
-  const applyFileInput = document.getElementById('applyFileInput');
-  const applyFileLabel = document.getElementById('applyFileLabel');
-  const applyFileUpload = document.getElementById('applyFileUpload');
+  function parseCSV(text) {
+    const rows = [];
+    let current = '';
+    let inQuotes = false;
 
-  const closeJobBtn = document.getElementById('closeJobModal');
-  const closeApplyBtn = document.getElementById('closeApplyModal');
-  const openApplyBtn = document.getElementById('openApplyForm');
-  const applySubmitBtn = document.getElementById('applySubmitBtn');
-  const applyBtnText = document.getElementById('applyBtnText');
-  const applyBtnSpinner = document.getElementById('applyBtnSpinner');
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      const next = text[i + 1];
 
-  let currentJobData = null;
-
-  if (closeJobBtn) {
-    closeJobBtn.addEventListener('click', () => closeModal(jobModal));
-  }
-
-  if (closeApplyBtn) {
-    closeApplyBtn.addEventListener('click', () => {
-      closeModal(applyModal);
-      applyForm?.reset();
-      applyFileLabel.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p><strong>Click to upload</strong> or drag and drop</p>
-        <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
-      `;
-    });
-  }
-
-  if (openApplyBtn) {
-    openApplyBtn.addEventListener('click', () => {
-      closeModal(jobModal);
-      openModal(applyModal);
-    });
-  }
-
-  // File upload pour apply form
-  if (applyFileLabel) {
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      applyFileLabel.addEventListener(eventName, (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
-
-    applyFileLabel.addEventListener('drop', (e) => {
-      const file = e.dataTransfer.files[0];
-      if (file) applyFileInput.files = e.dataTransfer.files;
-      updateFileDisplay(file, applyFileUpload, applyFileInput);
-    });
-
-    applyFileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      updateFileDisplay(file, applyFileUpload, applyFileInput);
-    });
-  }
-
-  // Toggle "Other cities" input si "Other" est sélectionné
-  const otherCitiesRow = document.getElementById('otherCitiesRow');
-  document.querySelectorAll('input[name="locations"]').forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-      const hasOther = Array.from(document.querySelectorAll('input[name="locations"]:checked'))
-        .some(cb => cb.value === 'Other');
-      if (otherCitiesRow) {
-        otherCitiesRow.style.display = hasOther ? 'block' : 'none';
+      if (ch === '"') {
+        if (inQuotes && next === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if ((ch === '\n' || (ch === '\r' && next === '\n')) && !inQuotes) {
+        if (current.trim() || rows.length > 0) {
+          rows.push(current);
+        }
+        current = '';
+        if (ch === '\r') i++;
+      } else {
+        current += ch;
       }
-    });
-  });
-
-  // Validation des languages
-  function validateLanguages() {
-    const checked = Array.from(document.querySelectorAll('input[name="languages"]:checked')).length > 0;
-    const error = document.getElementById('languagesError');
-    if (!checked && error) {
-      error.textContent = 'Please select at least one language';
-      error.classList.add('show');
-      return false;
-    } else if (error) {
-      error.classList.remove('show');
     }
-    return true;
-  }
+    if (current.trim()) rows.push(current);
 
-  // Validation des locations
-  function validateLocations() {
-    const checked = Array.from(document.querySelectorAll('input[name="locations"]:checked')).length > 0;
-    const error = document.getElementById('locationsError');
-    if (!checked && error) {
-      error.textContent = 'Please select at least one location';
-      error.classList.add('show');
-      return false;
-    } else if (error) {
-      error.classList.remove('show');
-    }
-    return true;
-  }
-
-  // Apply Form submission
-  if (applyForm) {
-    applyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Validation
-      if (!validateLanguages() || !validateLocations()) {
-        return;
+    return rows.map(row => {
+      const cells = [];
+      let cell = '';
+      let sq = false;
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+        const next = row[i + 1];
+        if (ch === '"') {
+          if (sq && next === '"') { cell += '"'; i++; }
+          else sq = !sq;
+        } else if (ch === ',' && !sq) {
+          cells.push(cell.trim());
+          cell = '';
+        } else {
+          cell += ch;
+        }
       }
-
-      const name = document.getElementById('applyName').value.trim();
-      const email = document.getElementById('applyEmail').value.trim();
-      const phone = document.getElementById('applyPhone').value.trim();
-      const location = document.getElementById('applyLocation').value.trim();
-      const subject = document.getElementById('applySubject').value;
-      const experience = document.getElementById('applyExperience').value;
-      const qualification = document.getElementById('applyQualification').value;
-      const salary = document.getElementById('applySalary').value;
-      const file = applyFileInput.files[0];
-
-      if (!name || !email || !phone || !location || !subject || !experience || !qualification || !salary || !file) {
-        alert('Please fill all required fields');
-        return;
-      }
-
-      // Collect languages
-      const languages = Array.from(document.querySelectorAll('input[name="languages"]:checked'))
-        .map(cb => cb.value)
-        .join(', ');
-
-      // Collect locations
-      const locations = Array.from(document.querySelectorAll('input[name="locations"]:checked'))
-        .map(cb => cb.value)
-        .join(', ');
-
-      const otherCities = document.getElementById('otherCities')?.value.trim() || '';
-
-      // Prépare FormData pour n8n
-      const formData = new FormData();
-      formData.append('fullName', name);
-      formData.append('email', email);
-      formData.append('phone', phone);
-      formData.append('location', location);
-      formData.append('subject', subject);
-      formData.append('experience', experience);
-      formData.append('qualification', qualification);
-      formData.append('languages', languages);
-      formData.append('locations', locations);
-      formData.append('otherCities', otherCities);
-      formData.append('skills', document.getElementById('applySkills').value.trim());
-      formData.append('salary', salary);
-      formData.append('notes', document.getElementById('applyNotes').value.trim());
-      formData.append('cv', file);
-      
-      // Ajoute les infos du job si disponibles
-      if (currentJobData) {
-        formData.append('jobTitle', currentJobData.Title || '');
-        formData.append('jobLocation', currentJobData.City || '');
-      }
-
-      // Spinner
-      applyBtnText.style.display = 'none';
-      applyBtnSpinner.style.display = 'inline-block';
-      applySubmitBtn.disabled = true;
-
-      try {
-        const res = await fetch(CONFIG.WEBHOOK_JOB_APPLICATION, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        // Succès
-        alert('Application submitted successfully! You\'ll hear from me soon.');
-        closeModal(applyModal);
-        applyForm.reset();
-
-      } catch (err) {
-        console.error('Application submission error:', err);
-        alert('Failed to submit application. Please try again.');
-      } finally {
-        applyBtnText.style.display = 'inline';
-        applyBtnSpinner.style.display = 'none';
-        applySubmitBtn.disabled = false;
-      }
+      cells.push(cell.trim());
+      return cells;
     });
   }
 
   // ============================================================
-  // VACANCIES — Chargement et affichage des jobs
+  // VACANCIES — Show state (loading / empty / error / results)
   // ============================================================
-  const counter = document.getElementById('vacanciesCount');
-  let allJobs = [];
-
   function showState(state, count = 0) {
-    const grid = document.getElementById('jobsGrid');
-    const filters = document.getElementById('vacanciesFilters');
-
-    if (grid) grid.style.display = 'none';
-    if (filters) filters.style.display = 'none';
-    if (counter) counter.className = 'vacancies__count';
-
-    document.querySelectorAll('.vacancies__state').forEach(el => {
-      el.classList.remove('is-visible');
+    ['vacanciesLoading', 'vacanciesEmpty', 'vacanciesError'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('is-visible');
     });
+
+    const grid    = document.getElementById('jobsGrid');
+    const filters = document.getElementById('vacanciesFilters');
+    const counter = document.getElementById('vacanciesCount');
+
+    if (grid)    grid.style.display    = 'none';
+    if (filters) filters.style.display = 'none';
+    counter.className = 'vacancies__count';
+    counter.textContent = '';
 
     if (state === 'loading') {
-      const loading = document.getElementById('vacanciesLoading');
-      if (loading) loading.classList.add('is-visible');
+      const el = document.getElementById('vacanciesLoading');
+      if (el) el.classList.add('is-visible');
     } else if (state === 'empty') {
-      const empty = document.getElementById('vacanciesEmpty');
-      if (empty) empty.classList.add('is-visible');
+      const el = document.getElementById('vacanciesEmpty');
+      if (el) el.classList.add('is-visible');
+      counter.classList.add('is-red');
+      counter.textContent = 'No open positions at the moment.';
     } else if (state === 'error') {
-      const error = document.getElementById('vacanciesError');
-      if (error) error.classList.add('is-visible');
+      const el = document.getElementById('vacanciesError');
+      if (el) el.classList.add('is-visible');
     } else if (state === 'results') {
-      if (grid) grid.style.display = 'grid';
+      if (grid)    grid.style.display    = 'grid';
       if (filters) filters.style.display = 'flex';
-      if (counter) {
-        counter.classList.add('is-green');
-        counter.textContent = `${count} open position${count !== 1 ? 's' : ''}`;
-      }
+      counter.classList.add('is-green');
+      counter.textContent = `${count} open position${count !== 1 ? 's' : ''}`;
     }
   }
 
+  // ============================================================
+  // VACANCIES — Render job cards
+  // ============================================================
   function renderCards(jobs) {
     const grid = document.getElementById('jobsGrid');
     if (!grid) return;
+    grid.innerHTML = '';
 
-    grid.innerHTML = jobs.map((job, idx) => {
-      const slug = generateJobSlug(job.Title, idx);
-      return `
-        <div class="job-card" data-slug="${slug}" data-index="${idx}">
-          <div class="job-card__top">
-            <div>
-              <span class="job-tag">${job['Job Type'] || 'Position'}</span>
-            </div>
+    jobs.forEach(job => {
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `View details for ${job.Title}`);
+
+      const type = job['Job Type'] || job.Type || '';
+      const school = job.School || '';
+      const city = job.City || '';
+      const salary = job['Annual base salary'] || job.Salary || '';
+      const shortDesc = job['Short Description'] || '';
+
+      card.innerHTML = `
+        <div class="job-card__top">
+          <div class="job-card__tags">
+            ${type ? `<span class="job-tag">${type}</span>` : ''}
           </div>
-          <h3 class="job-card__title">${job.Title || 'Untitled'}</h3>
-          <p class="job-card__school">${job.School || ''}</p>
-          <div class="job-card__meta">
-            <span>📍 ${job.City || 'Location TBA'}</span>
-            ${job['Annual base salary'] ? `<span>💰 ${job['Annual base salary']}</span>` : ''}
-          </div>
-          <p class="job-card__excerpt">${job['Short Description'] || ''}</p>
-          <button class="btn btn--outline btn--sm" data-index="${idx}">View Details</button>
+        </div>
+        <h3 class="job-card__title">${job.Title || 'Position'}</h3>
+        <p class="job-card__school">${school}</p>
+        <ul class="job-card__details">
+          ${city   ? `<li>📍 ${city}` : ''}
+          ${salary ? `<li>💰 ${salary}` : ''}
+        </ul>
+        <p class="job-card__short-desc">${shortDesc}</p>
+        <div class="job-card__footer">
+          <span class="job-card__cta">View details →</span>
         </div>
       `;
-    }).join('');
 
-    // Event listeners pour les cards
-    grid.querySelectorAll('.btn--outline').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.target.dataset.index, 10);
-        showJobDetail(jobs[idx]);
+      const openDetail = () => openJobModal(job);
+      card.addEventListener('click', openDetail);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(); }
       });
+
+      grid.appendChild(card);
     });
   }
 
-  function showJobDetail(job) {
-    currentJobData = job;
+  // ============================================================
+  // VACANCIES — Job detail modal
+  // ============================================================
+  const jobModal = document.getElementById('jobModal');
 
-    document.getElementById('jobModalTitle').textContent = job.Title || '';
-    document.getElementById('jd-type').textContent = job['Job Type'] || '';
-    document.getElementById('jd-subject').textContent = job['Subject'] || '';
-    document.getElementById('jd-location').querySelector('span').textContent = `${job.City || 'TBA'}, ${job.District || ''}`;
-    document.getElementById('jd-salary').querySelector('span').textContent = job['Annual base salary'] || 'Negotiable';
-    document.getElementById('jd-date').querySelector('span').textContent = formatDate(job['Date Posted'] || '');
+  function openJobModal(job) {
+    document.getElementById('jd-type').textContent        = job['Job Type'] || '';
+    document.getElementById('jd-subject').textContent    = '';
+    document.getElementById('jobModalTitle').textContent  = job.Title || 'Position';
 
-    document.getElementById('jd-description').innerHTML = formatJobText(job['Long Description'] || '');
+    const locationEl = document.querySelector('#jd-location span');
+    if (locationEl) locationEl.textContent = [job.City, job.District].filter(Boolean).join(', ') || job.Location || '';
+
+    const salaryEl = document.querySelector('#jd-salary span');
+    if (salaryEl) salaryEl.textContent = job['Annual base salary'] || job.Salary || '';
+
+    const dateEl = document.querySelector('#jd-date span');
+    if (dateEl) dateEl.textContent = job.Date_posted || job['Date Posted'] || '';
+
+    document.getElementById('jd-school').innerHTML    = job.School    ? `<strong>School:</strong> ${job.School}` : '';
+    document.getElementById('jd-district').innerHTML  = job.District  ? `<strong>District:</strong> ${job.District}` : '';
+    document.getElementById('jd-description').innerHTML   = formatJobText(job['Long Description'] || job.Description || '');
     document.getElementById('jd-requirements').innerHTML = formatJobText(job.Requirements || '');
+
+    jobModal.dataset.jobTitle    = job.Title    || '';
+    jobModal.dataset.jobSchool   = job.School   || '';
+    jobModal.dataset.jobCity     = job.City     || '';
+    jobModal.dataset.jobSalary   = job['Annual base salary'] || '';
 
     openModal(jobModal);
   }
 
-  // Filters
+  function formatJobText(text) {
+    if (!text) return '<p>—</p>';
+    if (/<[a-z][\s\S]*>/i.test(text)) return text;
+    const lines = text.split('\n').filter(l => l.trim());
+    const isList = lines.length > 0 && lines.every(l => /^[-•*]/.test(l.trim()));
+    if (isList) {
+      const items = lines.map(l => `<li>${l.replace(/^[-•*]\s*/, '').trim()}</li>`).join('');
+      return `<ul>${items}</ul>`;
+    }
+    return lines.map(l => `<p>${l.trim()}</p>`).join('');
+  }
+
+  document.getElementById('closeJobModal')?.addEventListener('click', () => closeModal(jobModal));
+
+  // ============================================================
+  // VACANCIES — Filters
+  // ============================================================
+  let allJobs = [];
+
   function applyFilters() {
     const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
-    const type = document.getElementById('filterType')?.value || '';
+    const type   = (document.getElementById('filterType')?.value || '').toLowerCase();
 
     const filtered = allJobs.filter(job => {
       const matchSearch =
         !search ||
-        (job.Title || '').toLowerCase().includes(search) ||
-        (job.School || '').toLowerCase().includes(search) ||
-        (job.City || '').toLowerCase().includes(search);
+        (job.Title    || '').toLowerCase().includes(search) ||
+        (job.School   || '').toLowerCase().includes(search) ||
+        (job.City     || '').toLowerCase().includes(search) ||
+        (job.District || '').toLowerCase().includes(search);
 
-      const matchType = !type || job['Job Type'] === type;
+      const jobType = (job['Job Type'] || job.Type || '').toLowerCase();
+      const matchType = !type || jobType === type;
 
       return matchSearch && matchType;
     });
 
     renderCards(filtered);
 
+    const counter = document.getElementById('vacanciesCount');
     if (counter) {
       counter.textContent = `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`;
-      counter.className = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
+      counter.className  = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
     }
   }
 
   document.getElementById('filterSearch')?.addEventListener('input', applyFilters);
   document.getElementById('filterType')?.addEventListener('change', applyFilters);
 
-  // Load jobs from Google Sheet
+  // ============================================================
+  // VACANCIES — Load from Google Sheet (CSV)
+  // ============================================================
   async function loadJobs() {
     showState('loading');
     try {
-      const res = await fetch(CONFIG.SHEET_JOBS);
+      const res = await fetch(SHEET_VACANCIES_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const raw = await res.text();
 
-      const csv = await res.text();
-      allJobs = parseCSV(csv).filter(job => job.Title && job.Title.trim() !== '');
+      const rows = parseCSV(raw);
+      if (rows.length < 2) { showState('empty'); return; }
+
+      const headers = rows[0].map(h => h.trim());
+      allJobs = rows.slice(1)
+        .map(row => {
+          const job = {};
+          headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
+          return job;
+        })
+        .filter(job => job.Title && job.Title.trim());
 
       if (allJobs.length === 0) {
         showState('empty');
       } else {
         showState('results', allJobs.length);
         renderCards(allJobs);
+
+        // Populate type filter dynamically
+        const typeSelect = document.getElementById('filterType');
+        if (typeSelect) {
+          const types = [...new Set(allJobs.map(j => j['Job Type'] || j.Type).filter(Boolean))].sort();
+          const firstOpt = typeSelect.querySelector('option[value=""]');
+          typeSelect.innerHTML = '';
+          if (firstOpt) typeSelect.appendChild(firstOpt);
+          else typeSelect.insertAdjacentHTML('afterbegin', '<option value="">All types</option>');
+          types.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            typeSelect.appendChild(opt);
+          });
+        }
       }
     } catch (err) {
-      console.error('Failed to load jobs:', err);
+      console.error('[VS Recruitment] Failed to load jobs:', err);
       showState('error');
     }
   }
 
   document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
-
-  // Load jobs on page load
   loadJobs();
 
-}); // fin DOMContentLoaded
+  // ============================================================
+  // CV MODAL — Passive candidates form
+  // ============================================================
+  const cvModal         = document.getElementById('cvModal');
+  const cvForm          = document.getElementById('cvForm');
+  const cvFormState     = document.getElementById('cvFormState');
+  const cvSuccessState  = document.getElementById('cvSuccessState');
+  const cvErrorState    = document.getElementById('cvErrorState');
+  const cvSubmitBtn     = document.getElementById('cvSubmitBtn');
+  const cvBtnText       = document.getElementById('cvBtnText');
+  const cvBtnSpinner    = document.getElementById('cvBtnSpinner');
+
+  // Open CV modal from About CTAs
+  document.getElementById('openCvForm')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal(cvModal);
+  });
+  document.getElementById('openCvFormVacancies')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal(cvModal);
+  });
+
+  // Close CV modal
+  document.getElementById('closeCvModal')?.addEventListener('click', () => closeModal(cvModal));
+
+  // --- Preferred Locations: show "Other" text input ---
+  const otherCitiesRow = document.getElementById('otherCitiesRow');
+  document.querySelectorAll('input[name="cv-locations"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const hasOther = Array.from(document.querySelectorAll('input[name="cv-locations"]:checked'))
+        .some(c => c.value === 'Other');
+      if (otherCitiesRow) otherCitiesRow.style.display = hasOther ? 'grid' : 'none';
+    });
+  });
+
+  // --- File upload (CV form) ---
+  const cvFileInput  = document.getElementById('cv-file');
+  const cvFileDrop  = document.getElementById('cvFileDrop');
+  const cvFilePreview = document.getElementById('cvFilePreview');
+  const cvFileName  = document.getElementById('cvFileName');
+
+  function showCvFile(file) {
+    cvFileName.textContent = file.name;
+    cvFileDrop.style.display  = 'none';
+    cvFilePreview.style.display = 'flex';
+  }
+
+  function clearCvFile() {
+    cvFileInput.value = '';
+    cvFileDrop.style.display   = 'flex';
+    cvFilePreview.style.display = 'none';
+  }
+
+  if (cvFileInput) {
+    cvFileInput.addEventListener('change', () => {
+      if (cvFileInput.files[0]) showCvFile(cvFileInput.files[0]);
+    });
+  }
+
+  document.getElementById('removeCvFile')?.addEventListener('click', clearCvFile);
+
+  if (cvFileDrop) {
+    cvFileDrop.addEventListener('dragover', (e) => { e.preventDefault(); cvFileDrop.classList.add('is-dragging'); });
+    cvFileDrop.addEventListener('dragleave', () => cvFileDrop.classList.remove('is-dragging'));
+    cvFileDrop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      cvFileDrop.classList.remove('is-dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        cvFileInput.files = dt.files;
+        showCvFile(file);
+      }
+    });
+  }
+
+  // --- CV Form validation ---
+  function validateCvForm() {
+    let valid = true;
+    const err = (id, msg) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.classList.add('show'); }
+      valid = false;
+    };
+    const clear = (id) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.classList.remove('show'); }
+    };
+
+    clear('err-cv-name'); clear('err-cv-email'); clear('err-cv-file');
+
+    const name  = document.getElementById('cv-name')?.value.trim();
+    const email = document.getElementById('cv-email')?.value.trim();
+    const file  = cvFileInput?.files[0];
+
+    if (!name) err('err-cv-name', 'Full Name is required');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-cv-email', 'Valid email is required');
+    if (!file) err('err-cv-file', 'Please attach your CV');
+    else if (file.size > 5 * 1024 * 1024) err('err-cv-file', 'File too large (max 5 MB)');
+    else if (!['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type))
+      err('err-cv-file', 'Only PDF, DOC or DOCX allowed');
+
+    return valid;
+  }
+
+  // --- CV Form submit ---
+  if (cvForm) {
+    cvForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateCvForm()) return;
+
+      cvBtnText.style.display    = 'none';
+      cvBtnSpinner.style.display  = 'inline-block';
+      cvSubmitBtn.disabled        = true;
+
+      const formData = new FormData();
+      formData.append('fullName',     document.getElementById('cv-name')?.value.trim());
+      formData.append('email',        document.getElementById('cv-email')?.value.trim());
+      formData.append('phone',        document.getElementById('cv-phone')?.value.trim());
+      formData.append('targetedRoles',document.getElementById('cv-targeted-roles')?.value.trim());
+      formData.append('subject',      document.getElementById('cv-subject')?.value);
+      formData.append('experience',   document.getElementById('cv-experience')?.value);
+      formData.append('qualification',document.getElementById('cv-qualification')?.value);
+      formData.append('skills',        document.getElementById('cv-skills')?.value.trim());
+      formData.append('languages',     Array.from(document.querySelectorAll('input[name="cv-languages"]:checked')).map(c => c.value).join(', '));
+      formData.append('expectedSalary',document.getElementById('cv-salary')?.value.trim());
+      formData.append('locations',     Array.from(document.querySelectorAll('input[name="cv-locations"]:checked')).map(c => c.value).join(', '));
+      formData.append('notes',        document.getElementById('cv-notes')?.value.trim());
+      formData.append('cv',           cvFileInput?.files[0]);
+
+      try {
+        const res = await fetch(CV_WEBHOOK, { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Webhook error');
+        cvFormState.style.display   = 'none';
+        cvSuccessState.style.display = 'flex';
+      } catch (err) {
+        console.error(err);
+        cvFormState.style.display  = 'none';
+        cvErrorState.style.display = 'flex';
+      } finally {
+        cvBtnText.style.display   = 'inline';
+        cvBtnSpinner.style.display = 'none';
+        cvSubmitBtn.disabled       = false;
+      }
+    });
+  }
+
+  document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
+    cvErrorState.style.display  = 'none';
+    cvFormState.style.display   = 'block';
+  });
+
+  document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
+    closeModal(cvModal);
+    setTimeout(() => {
+      cvSuccessState.style.display = 'none';
+      cvFormState.style.display    = 'block';
+      cvForm?.reset();
+      clearCvFile();
+    }, 300);
+  });
+
+  // ============================================================
+  // APPLY MODAL — Apply to a specific job
+  // ============================================================
+  const applyModal = document.getElementById('applyModal');
+  const applyForm  = document.getElementById('applyForm');
+  const applyStatus = document.getElementById('formStatus');
+
+  document.getElementById('closeApplyModal')?.addEventListener('click', () => {
+    closeModal(applyModal);
+    applyForm?.reset();
+    if (applyStatus) { applyStatus.style.display = 'none'; }
+  });
+
+  document.getElementById('openApplyForm')?.addEventListener('click', () => {
+    const jobTitle = document.getElementById('jobModalTitle')?.textContent || '';
+    const titleInput = document.getElementById('applyJobTitle');
+    if (titleInput) titleInput.value = jobTitle;
+    closeModal(jobModal);
+    openModal(applyModal);
+  });
+
+  // --- Apply: file upload ---
+  const applyFileInput = document.getElementById('applyCV');
+  const applyFileUpload = document.getElementById('applyFileUpload');
+
+  function handleApplyFile(file) {
+    const allowed = ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowed.includes(file.type)) { alert('Only PDF, DOC or DOCX allowed'); return; }
+    if (file.size > 5 * 1024 * 1024) { alert('File must be under 5 MB'); return; }
+
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    applyFileInput.files = dt.files;
+
+    applyFileUpload.classList.add('has-file');
+    applyFileUpload.querySelector('.file-upload__content').innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <p><strong>${file.name}</strong></p>
+      <p class="file-upload__hint">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+      <button type="button" class="file-upload__remove">Remove</button>
+    `;
+    applyFileUpload.querySelector('.file-upload__remove')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      applyFileInput.value = '';
+      applyFileUpload.classList.remove('has-file');
+      applyFileUpload.querySelector('.file-upload__content').innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p><strong>Click to upload</strong> or drag and drop</p>
+        <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
+      `;
+    });
+  }
+
+  if (applyFileUpload && applyFileInput) {
+    applyFileUpload.addEventListener('click', (e) => {
+      if (!e.target.closest('.file-upload__remove')) applyFileInput.click();
+    });
+    applyFileInput.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleApplyFile(e.target.files[0]);
+    });
+    applyFileUpload.addEventListener('dragover', (e) => { e.preventDefault(); applyFileUpload.classList.add('is-dragover'); });
+    applyFileUpload.addEventListener('dragleave', () => applyFileUpload.classList.remove('is-dragover'));
+    applyFileUpload.addEventListener('drop', (e) => {
+      e.preventDefault();
+      applyFileUpload.classList.remove('is-dragover');
+      if (e.dataTransfer.files[0]) handleApplyFile(e.dataTransfer.files[0]);
+    });
+  }
+
+  // --- Apply form submit ---
+  function validateApplyForm() {
+    let valid = true;
+    const err = (id, msg) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.classList.add('show'); }
+      valid = false;
+    };
+    const clear = (id) => {
+      const el = document.getElementById(id);
+      if (el) { el.textContent = ''; el.classList.remove('show'); }
+    };
+
+    clear('err-apply-name'); clear('err-apply-email'); clear('err-apply-phone');
+    clear('err-apply-subject'); clear('err-apply-experience'); clear('err-apply-cv');
+
+    const name  = document.getElementById('applyFullName')?.value.trim();
+    const email = document.getElementById('applyEmail')?.value.trim();
+    const phone = document.getElementById('applyPhone')?.value.trim();
+    const subject = document.getElementById('applySubject')?.value;
+    const experience = document.getElementById('applyExperience')?.value;
+    const file = applyFileInput?.files[0];
+
+    if (!name) err('err-apply-name', 'Full Name is required');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-apply-email', 'Valid email is required');
+    if (!phone) err('err-apply-phone', 'Phone Number is required');
+    if (!subject) err('err-apply-subject', 'Please select a subject');
+    if (!experience) err('err-apply-experience', 'Years of experience is required');
+    if (!file) err('err-apply-cv', 'Please attach your CV');
+    else if (file.size > 5 * 1024 * 1024) err('err-apply-cv', 'File too large (max 5 MB)');
+
+    return valid;
+  }
+
+  if (applyForm) {
+    applyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateApplyForm()) return;
+
+      const submitBtn = document.getElementById('applySubmitBtn');
+      const origText  = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      const formData = new FormData(applyForm);
+      formData.set('languages', Array.from(document.querySelectorAll('input[name="apply-languages"]:checked')).map(c => c.value).join(', '));
+      formData.set('locations', Array.from(document.querySelectorAll('input[name="apply-locations"]:checked')).map(c => c.value).join(', '));
+
+      try {
+        const res = await fetch(APPLY_WEBHOOK, { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Error');
+        if (applyStatus) {
+          applyStatus.textContent = '✓ Application submitted! I will review your profile and contact you within 48 hours.';
+          applyStatus.className = 'form-status success';
+          applyStatus.style.display = 'block';
+        }
+        applyForm.reset();
+        applyFileUpload?.classList.remove('has-file');
+        if (applyFileUpload) {
+          applyFileUpload.querySelector('.file-upload__content').innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
+          `;
+        }
+        setTimeout(() => closeModal(applyModal), 2000);
+      } catch (err) {
+        console.error(err);
+        if (applyStatus) {
+          applyStatus.textContent = 'Something went wrong. Please try again or contact me directly.';
+          applyStatus.className = 'form-status error';
+          applyStatus.style.display = 'block';
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origText;
+      }
+    });
+  }
+
+}); // end DOMContentLoaded
