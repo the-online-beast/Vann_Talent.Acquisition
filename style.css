@@ -1219,7 +1219,7 @@ button { cursor: pointer; font-family: inherit; }
    APPLY FORM — Styling
 ============================================================ */
 .modal--wide {
-  max-width: 600px;
+  max-width: 680px;
 }
 
 .apply-form {
@@ -1245,7 +1245,7 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 .form-group label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--color-text);
 }
@@ -1259,11 +1259,11 @@ button { cursor: pointer; font-family: inherit; }
   padding: 10px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
   font-family: inherit;
+  font-size: 0.9rem;
   background: var(--color-surface);
   color: var(--color-text);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s;
 }
 
 .form-group input[type="text"]:focus,
@@ -1282,13 +1282,141 @@ button { cursor: pointer; font-family: inherit; }
   min-height: 80px;
 }
 
-.form-group select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-  padding-right: 36px;
+/* Checkboxes */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent);
+}
+
+.checkbox-label:hover {
+  color: var(--color-accent);
+}
+
+/* File Upload */
+.file-upload {
+  position: relative;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.file-upload:hover {
+  border-color: var(--color-accent);
+  background-color: rgba(27, 42, 74, 0.02);
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-upload__content {
+  pointer-events: none;
+}
+
+.file-upload__content svg {
+  color: var(--color-accent);
+  margin-bottom: 8px;
+}
+
+.file-upload__content p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.file-upload__content p strong {
+  color: var(--color-accent);
+}
+
+.file-upload__hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.file-upload.has-file {
+  border-color: #2d6a4f;
+  background-color: rgba(45, 106, 79, 0.05);
+}
+
+.file-upload.has-file .file-upload__content svg {
+  color: #2d6a4f;
+}
+
+/* Form Status Messages */
+.form-status {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.form-status.success {
+  background-color: rgba(45, 106, 79, 0.1);
+  color: #2d6a4f;
+  border: 1px solid rgba(45, 106, 79, 0.3);
+}
+
+.form-status.error {
+  background-color: rgba(185, 64, 64, 0.1);
+  color: #b94040;
+  border: 1px solid rgba(185, 64, 64, 0.3);
+}
+
+/* Form Error */
+.form-error {
+  font-size: 0.8rem;
+  color: #b94040;
+  display: block;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.form-disclaimer {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 20px;
+  }
 }
 
 /* ============================================================
