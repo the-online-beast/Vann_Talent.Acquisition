@@ -282,19 +282,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ---- File Upload Handler ----
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showFormStatus('File size exceeds 5MB. Please upload a smaller file.', 'error');
-        fileInput.value = '';
-        fileUpload.classList.remove('has-file');
-      } else {
-        fileUpload.classList.add('has-file');
+        // File Upload Handler
+      const fileUpload = document.getElementById('fileUpload');
+      const fileInput = document.getElementById('applyCV');
+
+      if (fileUpload && fileInput) {
+        // Click to upload
+        fileUpload.addEventListener('click', (e) => {
+          if (!e.target.closest('.file-upload__remove')) {
+            fileInput.click();
+          }
+        });
+
+        // File selection
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+          }
+        });
+
+        // Drag and drop
+        fileUpload.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fileUpload.classList.add('is-dragover');
+        });
+
+        fileUpload.addEventListener('dragleave', () => {
+          fileUpload.classList.remove('is-dragover');
+        });
+
+        fileUpload.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fileUpload.classList.remove('is-dragover');
+          if (e.dataTransfer.files.length > 0) {
+            handleFileSelect(e.dataTransfer.files[0]);
+          }
+        });
       }
-    }
-  });
+
+      function handleFileSelect(file) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+        if (!allowedTypes.includes(file.type)) {
+          alert('Please upload a PDF, DOC, or DOCX file');
+          return;
+        }
+
+        if (file.size > maxSize) {
+          alert('File size must be less than 5MB');
+          return;
+        }
+
+        fileInput.files = new DataTransfer().items.add(file).files;
+        fileUpload.classList.add('has-file');
+        fileUpload.querySelector('.file-upload__content').innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <p><strong>${file.name}</strong></p>
+          <p class="file-upload__hint">${(file.size / 1024 / 1024).toFixed(2)}MB</p>
+          <button type="button" class="file-upload__remove">Remove</button>
+        `;
+        document.querySelector('.file-upload__remove').addEventListener('click', (e) => {
+          e.preventDefault();
+          fileInput.value = '';
+          fileUpload.classList.remove('has-file');
+          fileUpload.querySelector('.file-upload__content').innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p><strong>Click to upload</strong> or drag and drop</p>
+            <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
+          `;
+        });
+      }
 
   // ---- Languages Validation (at least one) ----
   function validateLanguages() {
