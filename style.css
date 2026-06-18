@@ -1594,3 +1594,110 @@ button { cursor: pointer; font-family: inherit; }
   }
 }
 
+/* ============================================================
+   MODAL — Scrollable Fix
+============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 20px;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px; /* Laisse de l'espace pour voir le haut */
+}
+
+.modal-overlay.is-open {
+  display: flex;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.modal--wide {
+  max-width: 680px;
+}
+
+/* ============================================================
+   MODAL — Close button
+============================================================ */
+.modal__close {
+  position: sticky;
+  top: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: none;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+  z-index: 10;
+  float: right;
+  margin: -36px -36px 16px 0;
+}
+
+.modal__close:hover {
+  background: var(--color-tag-bg);
+  color: var(--color-text);
+}
+
+.modal__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  clear: both;
+}
+
+.modal__subtitle {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.modal__placeholder {
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   RESPONSIVE — Modal
+============================================================ */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 10px;
+    padding-top: 50px;
+  }
+
+  .modal {
+    padding: 20px;
+    max-height: calc(100vh - 70px);
+  }
+
+  .modal__close {
+    margin: -20px -20px 12px 0;
+  }
+}
+
