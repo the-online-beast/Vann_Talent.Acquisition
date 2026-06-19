@@ -1,36 +1,34 @@
-// ============================================================
-// main.js — Complete site logic
-// ============================================================
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // ============================================================
-  // NAVBAR — Burger menu
+  // BURGER MENU
   // ============================================================
   const burgerBtn  = document.getElementById('burgerBtn');
   const mobileMenu = document.getElementById('mobileMenu');
 
-  if (burgerBtn) {
-    burgerBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('is-open');
-    });
-  }
+  burgerBtn?.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('is-open');
+    burgerBtn.setAttribute('aria-expanded', isOpen);
+  });
 
   document.querySelectorAll('.mobile-link').forEach(link => {
     link.addEventListener('click', () => {
       mobileMenu.classList.remove('is-open');
+      burgerBtn.setAttribute('aria-expanded', 'false');
     });
   });
 
   // ============================================================
-  // MODAL UTILITY
+  // MODAL HELPERS
   // ============================================================
   function openModal(modal) {
+    if (!modal) return;
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
   }
 
   function closeModal(modal) {
+    if (!modal) return;
     modal.classList.remove('is-open');
     document.body.style.overflow = '';
   }
@@ -50,307 +48,413 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ============================================================
-  // VACANCIES — CSV Parser (handles quoted fields with commas)
+  // VACANCIES — Load from JOBS_DATA (defined in jobs.js)
   // ============================================================
-  function parseCSV(text) {
-    const rows = [];
-    let current = '';
-    let inQuotes = false;
+  let allJobs = [];
 
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      const next = text[i + 1];
-
-      if (ch === '"') {
-        if (inQuotes && next === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-      } else if ((ch === '\n' || (ch === '\r' && next === '\n')) && !inQuotes) {
-        if (current.trim() || rows.length > 0) {
-          rows.push(current);
-        }
-        current = '';
-        if (ch === '\r') i++;
-      } else {
-        current += ch;
-      }
-    }
-    if (current.trim()) rows.push(current);
-
-    return rows.map(row => {
-      const cells = [];
-      let cell = '';
-      let sq = false;
-      for (let i = 0; i < row.length; i++) {
-        const ch = row[i];
-        const next = row[i + 1];
-        if (ch === '"') {
-          if (sq && next === '"') { cell += '"'; i++; }
-          else sq = !sq;
-        } else if (ch === ',' && !sq) {
-          cells.push(cell.trim());
-          cell = '';
-        } else {
-          cell += ch;
-        }
-      }
-      cells.push(cell.trim());
-      return cells;
-    });
-  }
-
-  // ============================================================
-  // VACANCIES — Show state (loading / empty / error / results)
-  // ============================================================
-  function showState(state, count = 0) {
-    ['vacanciesLoading', 'vacanciesEmpty', 'vacanciesError'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('is-visible');
-    });
-
+  function showState(state, count) {
     const grid    = document.getElementById('jobsGrid');
-    const filters = document.getElementById('vacanciesFilters');
-    const counter = document.getElementById('vacanciesCount');
+    const empty   = document.getElementById('jobsEmpty');
+    const error   = document.getElementById('jobsError');
+    const loading = document.getElementById('jobsLoading');
+    const filters = document.querySelector('.vacancies__filters');
+    const countEl = document.querySelector('.vacancies__count');
 
-    if (grid)    grid.style.display    = 'none';
-    if (filters) filters.style.display = 'none';
-    counter.className = 'vacancies__count';
-    counter.textContent = '';
+    [grid, empty, error, loading].forEach(el => { if (el) el.style.display = 'none'; });
 
     if (state === 'loading') {
-      const el = document.getElementById('vacanciesLoading');
-      if (el) el.classList.add('is-visible');
+      if (loading) loading.style.display = 'block';
     } else if (state === 'empty') {
-      const el = document.getElementById('vacanciesEmpty');
-      if (el) el.classList.add('is-visible');
-      counter.classList.add('is-red');
-      counter.textContent = 'No open positions at the moment.';
+      if (empty) empty.style.display = 'block';
+      if (filters) filters.style.display = 'none';
     } else if (state === 'error') {
-      const el = document.getElementById('vacanciesError');
-      if (el) el.classList.add('is-visible');
+      if (error) error.style.display = 'block';
+      if (filters) filters.style.display = 'none';
     } else if (state === 'results') {
-      if (grid)    grid.style.display    = 'grid';
+      if (grid) grid.style.display = 'grid';
       if (filters) filters.style.display = 'flex';
-      counter.classList.add('is-green');
-      counter.textContent = `${count} open position${count !== 1 ? 's' : ''}`;
-    }
-  }
-
-  // ============================================================
-// RENDER JOB CARDS
-// ============================================================
-function escapeHtml(str) {
-  return (str || '')
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"');
-}
-  function formatJobText(text) {
-  if (!text) return '<p>—</p>';
-  if (/<[a-z][\s\S]*>/i.test(text)) return text;
-
-  const lines = text.split('\n').filter(l => l.trim());
-  const isList = lines.length > 1 && lines.every(l => /^[-•*]/.test(l.trim()));
-
-  if (isList) {
-    const items = lines.map(l =>
-      `<li>${escapeHtml(l.replace(/^[-•*]\s*/, '').trim())}</li>`
-    ).join('');
-    return `<ul>${items}</ul>`;
-  }
-
-  return lines.map(l => `<p>${escapeHtml(l.trim())}</p>`).join('');
-}
-
-  function renderCards(jobs) {
-  const grid = document.getElementById('jobsGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-
-  jobs.forEach((job, idx) => {
-    const card = document.createElement('article');
-    card.className = 'job-card';
-    card.dataset.idx = idx;
-
-    const type     = job['Contract type']       || '';
-    const title    = job['Job title']           || 'Untitled';
-    const school   = job['Establishment']       || '';
-    const city     = job['City']               || '';
-    const district = job['Discrict']           || '';   // note: typo conservé du sheet
-    const salary   = job['Annual base salary'] || '';
-    const shortDesc = job['Short description'] || '';
-
-    card.innerHTML = `
-      <div class="job-card__header">
-        <span class="job-card__type">${escapeHtml(type)}</span>
-      </div>
-      <h3 class="job-card__title">${escapeHtml(title)}</h3>
-      <p class="job-card__school">${escapeHtml(school)}</p>
-      <p class="job-card__meta">
-        <span class="job-card__location">${escapeHtml(city)}${district ? ' · ' + district : ''}</span>
-        ${salary ? `<span class="job-card__salary">${escapeHtml(salary)}</span>` : ''}
-      </p>
-      <p class="job-card__excerpt">${escapeHtml(shortDesc)}</p>
-      <span class="job-card__cta">View details →</span>
-    `;
-
-    card.addEventListener('click', () => openJobModal(job));
-    grid.appendChild(card);
-  });
-}
-
-// ============================================================
-// OPEN JOB MODAL
-// ============================================================
-function openJobModal(job) {
-  const type      = job['Contract type']       || '';
-  const title     = job['Job title']           || 'Position';
-  const city      = job['City']               || '';
-  const district  = job['Discrict']           || '';
-  const salary    = job['Annual base salary'] || '';
-  const school    = job['Establishment']       || '';
-  const longDesc  = job['Long description']   || '';
-  const requirements = job['Requirements']    || '';
-
-  document.getElementById('jd-type').textContent      = type;
-  document.getElementById('jobModalTitle').textContent = title;
-
-  document.querySelector('#jd-location span').textContent = city + (district ? ` · ${district}` : '');
-  document.querySelector('#jd-salary span').textContent   = salary;
-  document.querySelector('#jd-date span').textContent     = '';
-
-  const schoolEl   = document.getElementById('jd-school');
-  const districtEl = document.getElementById('jd-district');
-  if (schoolEl)   schoolEl.textContent   = school;
-  if (districtEl) districtEl.textContent = district;
-
-  document.getElementById('jd-description').innerHTML  = formatJobText(longDesc);
-  document.getElementById('jd-requirements').innerHTML = formatJobText(requirements);
-
-  jobModal.dataset.jobTitle    = title;
-  jobModal.dataset.jobId       = title;
-  jobModal.dataset.jobSchool   = school;
-  jobModal.dataset.jobLocation = city;
-
-  openModal(jobModal);
-}
-
-
-// ============================================================
-// APPLY FILTERS — mettre à jour aussi le filtre par type
-// ============================================================
-function applyFilters() {
-  const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
-  const type   = (document.getElementById('filterType')?.value  || '').toLowerCase();
-
-  const filtered = allJobs.filter(job => {
-    const jobTitle = (job['Job title']     || '').toLowerCase();
-    const jobSchool = (job['Establishment'] || '').toLowerCase();
-    const jobCity   = (job['City']         || '').toLowerCase();
-    const jobType = (job['Contract type'] || '').toLowerCase();
-
-    const matchSearch = !search ||
-      jobTitle.includes(search) ||
-      jobSchool.includes(search) ||
-      jobCity.includes(search);
-
-    const matchType = !type || jobType === type;
-
-    return matchSearch && matchType;
-  });
-
-  renderCards(filtered);
-
-  const counter = document.getElementById('vacanciesCount');
-  if (counter) {
-    counter.textContent = `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`;
-    counter.className   = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
-  }
-}
-
-
-  // ============================================================
-// VACANCIES — Load from Google Sheet (CSV)
-// ============================================================
-async function loadJobs() {
-  showState('loading');
-  try {
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(SHEET_VACANCIES_URL)}`;
-const res = await fetch(proxyUrl);
-if (!res.ok) throw new Error(`HTTP ${res.status}`);
-const raw = await res.text();
-
-    // DEBUG — voir ce qu'on reçoit
-    console.log('[DEBUG] raw CSV (first 500 chars):', raw.substring(0, 500));
-    console.log('[DEBUG] raw length:', raw.length);
-
-    const rows = parseCSV(raw);
-    console.log('[DEBUG] rows parsed:', rows.length);
-    console.log('[DEBUG] headers:', rows[0]);
-    console.log('[DEBUG] first data row:', rows[1]);
-
-    if (rows.length < 2) { showState('empty'); return; }
-
-    const headers = rows[0].map(h => h.trim());
-    allJobs = rows.slice(1)
-  .map(row => {
-    const job = {};
-    headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
-    return job;
-  })
-  .filter(job => (job['Job title'] || '').trim()); // ← minuscule 't'
-
-    console.log('[DEBUG] allJobs after filter:', allJobs.length, allJobs);
-
-    if (allJobs.length === 0) {
-      showState('empty');
-    } else {
-      showState('results', allJobs.length);
-      renderCards(allJobs);
-
-      // Populate type filter dynamically
-      const typeSelect = document.getElementById('filterType');
-      if (typeSelect) {
-        const types = [...new Set(allJobs.map(j => j['Contract type']).filter(Boolean))].sort();
-        const firstOpt = typeSelect.querySelector('option[value=""]');
-        typeSelect.innerHTML = '';
-        if (firstOpt) typeSelect.appendChild(firstOpt);
-        else typeSelect.insertAdjacentHTML('afterbegin', '<option value="">All types</option>');
-        types.forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t;
-          opt.textContent = t;
-          typeSelect.appendChild(opt);
-        });
+      if (countEl) {
+        countEl.textContent = `${count} position${count !== 1 ? 's' : ''} available`;
+        countEl.className = 'vacancies__count ' + (count > 0 ? 'is-green' : 'is-red');
       }
     }
-  } catch (err) {
-    console.error('[VS Recruitment] Failed to load jobs:', err);
-    showState('error');
   }
-}
 
-document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
-loadJobs();
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"');
+  }
 
+  function formatJobText(text) {
+    if (!text) return '<p>—</p>';
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return '<p>—</p>';
+
+    const isList = lines.every(l => /^[-•*]/.test(l));
+    if (isList) {
+      const items = lines.map(l =>
+        `<li>${escapeHtml(l.replace(/^[-•*]\s*/, '').trim())}</li>`
+      ).join('');
+      return `<ul>${items}</ul>`;
+    }
+    return lines.map(l => `<p>${escapeHtml(l.trim())}</p>`).join('');
+  }
+
+  function renderCards(jobs) {
+    const grid = document.getElementById('jobsGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    jobs.forEach((job, idx) => {
+      const card = document.createElement('article');
+      card.className = 'job-card';
+      card.dataset.idx = idx;
+
+      const type      = job['Contract type']       || '';
+      const title     = job['Job title']           || 'Untitled';
+      const school    = job['Establishment']       || '';
+      const city      = job['City']                || '';
+      const district  = job['Discrict']            || '';
+      const salary    = job['Annual base salary']  || '';
+      const shortDesc = job['Short description']   || '';
+
+      card.innerHTML = `
+        <div class="job-card__header">
+          ${type ? `<span class="job-card__tag">${escapeHtml(type)}</span>` : ''}
+          <h3 class="job-card__title">${escapeHtml(title)}</h3>
+          <p class="job-card__school">${escapeHtml(school)}</p>
+        </div>
+        <div class="job-card__body">
+          <p class="job-card__desc">${escapeHtml(shortDesc)}</p>
+        </div>
+        <div class="job-card__footer">
+          <span class="job-card__meta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${escapeHtml(city)}${district ? ` · ${escapeHtml(district)}` : ''}
+          </span>
+          ${salary ? `<span class="job-card__meta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            MYR ${escapeHtml(salary)}
+          </span>` : ''}
+          <button class="btn btn--outline btn--sm job-card__cta" data-idx="${idx}">View & Apply</button>
+        </div>
+      `;
+
+      card.querySelector('.job-card__cta').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openJobDetail(idx);
+      });
+      card.addEventListener('click', () => openJobDetail(idx));
+      grid.appendChild(card);
+    });
+  }
+
+  function applyFilters() {
+    const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
+    const type   = (document.getElementById('filterType')?.value   || '').toLowerCase();
+
+    const filtered = allJobs.filter(job => {
+      const matchSearch =
+        !search ||
+        (job['Job title']    || '').toLowerCase().includes(search) ||
+        (job['Establishment']|| '').toLowerCase().includes(search) ||
+        (job['City']         || '').toLowerCase().includes(search) ||
+        (job['Short description'] || '').toLowerCase().includes(search);
+
+      const matchType =
+        !type ||
+        (job['Contract type'] || '').toLowerCase() === type;
+
+      return matchSearch && matchType;
+    });
+
+    renderCards(filtered);
+    const countEl = document.querySelector('.vacancies__count');
+    if (countEl) {
+      countEl.textContent = `${filtered.length} position${filtered.length !== 1 ? 's' : ''} available`;
+      countEl.className = 'vacancies__count ' + (filtered.length > 0 ? 'is-green' : 'is-red');
+    }
+  }
+
+  function loadJobs() {
+    showState('loading');
+    try {
+      allJobs = (typeof JOBS_DATA !== 'undefined' && Array.isArray(JOBS_DATA)) ? JOBS_DATA : [];
+      if (allJobs.length === 0) {
+        showState('empty');
+      } else {
+        showState('results', allJobs.length);
+        renderCards(allJobs);
+        // Populate type filter
+        const typeSelect = document.getElementById('filterType');
+        if (typeSelect) {
+          const types = [...new Set(allJobs.map(j => j['Contract type']).filter(Boolean))];
+          types.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.toLowerCase();
+            opt.textContent = t;
+            typeSelect.appendChild(opt);
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[Jobs] Error loading jobs:', err);
+      showState('error');
+    }
+  }
+
+  document.getElementById('filterSearch')?.addEventListener('input', applyFilters);
+  document.getElementById('filterType')?.addEventListener('change', applyFilters);
+  document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
+  loadJobs();
+
+  // ============================================================
+  // JOB DETAIL MODAL
+  // ============================================================
+  const jobModal = document.getElementById('jobModal');
+
+  function openJobDetail(idx) {
+    const job = allJobs[idx];
+    if (!job || !jobModal) return;
+
+    const title       = job['Job title']           || 'Untitled';
+    const school      = job['Establishment']       || '';
+    const city        = job['City']                || '';
+    const district    = job['Discrict']            || '';
+    const salary      = job['Annual base salary']  || '';
+    const longDesc    = job['Long description']    || '';
+    const requirements= job['Requirements']        || '';
+    const type        = job['Contract type']       || '';
+
+    const titleEl = document.getElementById('jd-title');
+    const typeEl  = document.getElementById('jd-type');
+    if (titleEl) titleEl.textContent = title;
+    if (typeEl)  typeEl.textContent  = type;
+
+    const locSpan = document.querySelector('#jd-location span');
+    const salSpan = document.querySelector('#jd-salary span');
+    if (locSpan) locSpan.textContent = city + (district ? ` · ${district}` : '');
+    if (salSpan) salSpan.textContent = salary ? `MYR ${salary}` : '—';
+
+    const schoolEl   = document.getElementById('jd-school');
+    const districtEl = document.getElementById('jd-district');
+    if (schoolEl)   schoolEl.textContent   = school;
+    if (districtEl) districtEl.textContent = district;
+
+    const descEl = document.getElementById('jd-description');
+    const reqEl  = document.getElementById('jd-requirements');
+    if (descEl) descEl.innerHTML = formatJobText(longDesc);
+    if (reqEl)  reqEl.innerHTML  = formatJobText(requirements);
+
+    jobModal.dataset.jobTitle    = title;
+    jobModal.dataset.jobId       = title;
+    jobModal.dataset.jobSchool   = school;
+    jobModal.dataset.jobLocation = city;
+
+    openModal(jobModal);
+  }
+
+  document.getElementById('closeJobModal')?.addEventListener('click', () => closeModal(jobModal));
+
+  // Apply button inside job detail → open apply modal
+  document.getElementById('jd-applyBtn')?.addEventListener('click', () => {
+    closeModal(jobModal);
+    const applyModal = document.getElementById('applyModal');
+    if (applyModal) {
+      // Pre-fill job title in apply form
+      const jobTitleDisplay = document.getElementById('apply-job-title');
+      if (jobTitleDisplay) jobTitleDisplay.textContent = jobModal.dataset.jobTitle || '';
+      openModal(applyModal);
+    }
+  });
+
+  // ============================================================
+  // APPLY MODAL — Full application form
+  // ============================================================
+  const applyModal = document.getElementById('applyModal');
+  const applyForm  = document.getElementById('applyForm');
+
+  document.getElementById('closeApplyModal')?.addEventListener('click', () => closeModal(applyModal));
+
+  // File upload (apply form)
+  const applyFileInput = document.getElementById('apply-cv-file');
+  const applyFileDrop  = document.getElementById('apply-cv-drop');
+
+  function showApplyFile(file) {
+    if (!applyFileDrop) return;
+    applyFileDrop.classList.add('has-file');
+    const content = applyFileDrop.querySelector('.file-upload__content p');
+    if (content) content.innerHTML = `<strong>${escapeHtml(file.name)}</strong> (${(file.size / 1024).toFixed(0)} KB)`;
+    const removeBtn = applyFileDrop.querySelector('.file-upload__remove');
+    if (removeBtn) removeBtn.style.display = 'inline-block';
+  }
+
+  function clearApplyFile() {
+    if (!applyFileDrop || !applyFileInput) return;
+    applyFileInput.value = '';
+    applyFileDrop.classList.remove('has-file');
+    const content = applyFileDrop.querySelector('.file-upload__content p');
+    if (content) content.innerHTML = `<strong>Choose a file</strong> or drag & drop`;
+    const removeBtn = applyFileDrop.querySelector('.file-upload__remove');
+    if (removeBtn) removeBtn.style.display = 'none';
+  }
+
+  applyFileDrop?.addEventListener('click', () => applyFileInput?.click());
+  applyFileInput?.addEventListener('change', () => {
+    if (applyFileInput.files[0]) showApplyFile(applyFileInput.files[0]);
+  });
+  applyFileDrop?.querySelector('.file-upload__remove')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearApplyFile();
+  });
+
+  if (applyFileDrop) {
+    applyFileDrop.addEventListener('dragover', (e) => { e.preventDefault(); applyFileDrop.classList.add('is-dragging'); });
+    applyFileDrop.addEventListener('dragleave', () => applyFileDrop.classList.remove('is-dragging'));
+    applyFileDrop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      applyFileDrop.classList.remove('is-dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        applyFileInput.files = dt.files;
+        showApplyFile(file);
+      }
+    });
+  }
+
+  // --- Apply Form validation ---
+  function validateApplyForm() {
+    let valid = true;
+    const err   = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add('show'); } valid = false; };
+    const clear = (id)      => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.classList.remove('show'); } };
+
+    const fields = ['err-apply-name','err-apply-email','err-apply-phone','err-apply-function',
+                    'err-apply-experience','err-apply-qualification','err-apply-skills',
+                    'err-apply-languages','err-apply-salary','err-apply-locations','err-apply-file'];
+    fields.forEach(clear);
+
+    const name          = document.getElementById('apply-name')?.value.trim();
+    const email         = document.getElementById('apply-email')?.value.trim();
+    const phone         = document.getElementById('apply-phone')?.value.trim();
+    const jobFunction   = document.getElementById('apply-function')?.value.trim();
+    const experience    = document.getElementById('apply-experience')?.value;
+    const qualification = document.getElementById('apply-qualification')?.value;
+    const skills        = document.getElementById('apply-skills')?.value.trim();
+    const languages     = document.querySelectorAll('input[name="apply-languages"]:checked');
+    const salary        = document.getElementById('apply-salary')?.value.trim();
+    const locations     = document.querySelectorAll('input[name="apply-locations"]:checked');
+    const file          = applyFileInput?.files[0];
+
+    if (!name)          err('err-apply-name',          'Full name is required.');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-apply-email', 'Valid email is required.');
+    if (!phone)         err('err-apply-phone',         'Phone number is required.');
+    if (!jobFunction)   err('err-apply-function',      'Job function is required.');
+    if (!experience)    err('err-apply-experience',    'Please select your experience level.');
+    if (!qualification) err('err-apply-qualification', 'Please select your qualification.');
+    if (!skills)        err('err-apply-skills',        'Please enter at least one skill.');
+    if (!languages.length) err('err-apply-languages',  'Select at least one language.');
+    if (!salary)        err('err-apply-salary',        'Expected salary is required.');
+    if (!locations.length) err('err-apply-locations',  'Select at least one location.');
+    if (!file)          err('err-apply-file',          'Please attach your CV.');
+
+    return valid;
+  }
+
+  applyForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateApplyForm()) return;
+
+    const submitBtn  = document.getElementById('applySubmitBtn');
+    const btnText    = document.getElementById('applyBtnText');
+    const btnSpinner = document.getElementById('applyBtnSpinner');
+
+    submitBtn.disabled      = true;
+    if (btnText)    btnText.style.display    = 'none';
+    if (btnSpinner) btnSpinner.style.display = 'inline-block';
+
+    try {
+      const languages = [...document.querySelectorAll('input[name="apply-languages"]:checked')].map(c => c.value).join(', ');
+      const locations = [...document.querySelectorAll('input[name="apply-locations"]:checked')].map(c => c.value).join(', ');
+
+      const formData = new FormData();
+      formData.append('fullName',       document.getElementById('apply-name')?.value.trim()          || '');
+      formData.append('email',          document.getElementById('apply-email')?.value.trim()         || '');
+      formData.append('phone',          document.getElementById('apply-phone')?.value.trim()         || '');
+      formData.append('subject',        document.getElementById('apply-subject')?.value.trim()       || '');
+      formData.append('jobFunction',    document.getElementById('apply-function')?.value.trim()      || '');
+      formData.append('targetedRoles',  document.getElementById('apply-targeted-roles')?.value.trim()|| '');
+      formData.append('experience',     document.getElementById('apply-experience')?.value           || '');
+      formData.append('qualification',  document.getElementById('apply-qualification')?.value        || '');
+      formData.append('skills',         document.getElementById('apply-skills')?.value.trim()        || '');
+      formData.append('languages',      languages);
+      formData.append('expectedSalary', document.getElementById('apply-salary')?.value.trim()        || '');
+      formData.append('locations',      locations);
+      formData.append('notes',          document.getElementById('apply-notes')?.value.trim()         || '');
+      formData.append('jobTitle',       applyModal?.dataset.jobTitle || jobModal?.dataset.jobTitle   || '');
+      formData.append('driveFolder',    DRIVE_FOLDER);
+
+      if (applyFileInput?.files[0]) {
+        formData.append('cv', applyFileInput.files[0]);
+      }
+
+      const res = await fetch(APPLY_WEBHOOK, { method: 'POST', body: formData });
+
+      const applyFormState   = document.getElementById('applyFormState');
+      const applySuccessState= document.getElementById('applySuccessState');
+      const applyErrorState  = document.getElementById('applyErrorState');
+
+      if (res.ok) {
+        if (applyFormState)    applyFormState.style.display    = 'none';
+        if (applySuccessState) applySuccessState.style.display = 'block';
+        if (applyErrorState)   applyErrorState.style.display   = 'none';
+      } else {
+        throw new Error(`HTTP ${res.status}`);
+      }
+    } catch (err) {
+      console.error('[Apply] Error:', err);
+      const applyFormState   = document.getElementById('applyFormState');
+      const applySuccessState= document.getElementById('applySuccessState');
+      const applyErrorState  = document.getElementById('applyErrorState');
+      if (applyFormState)    applyFormState.style.display    = 'none';
+      if (applySuccessState) applySuccessState.style.display = 'none';
+      if (applyErrorState)   applyErrorState.style.display   = 'block';
+    } finally {
+      submitBtn.disabled      = false;
+      if (btnText)    btnText.style.display    = 'inline';
+      if (btnSpinner) btnSpinner.style.display = 'none';
+    }
+  });
+
+  document.getElementById('applySuccessClose')?.addEventListener('click', () => {
+    closeModal(applyModal);
+    applyForm?.reset();
+    clearApplyFile();
+    document.getElementById('applyFormState').style.display    = 'block';
+    document.getElementById('applySuccessState').style.display = 'none';
+  });
+
+  document.getElementById('applyRetryBtn')?.addEventListener('click', () => {
+    document.getElementById('applyFormState').style.display  = 'block';
+    document.getElementById('applyErrorState').style.display = 'none';
+  });
 
   // ============================================================
   // CV MODAL — Passive candidates form
   // ============================================================
-  const cvModal         = document.getElementById('cvModal');
-  const cvForm          = document.getElementById('cvForm');
-  const cvFormState     = document.getElementById('cvFormState');
-  const cvSuccessState  = document.getElementById('cvSuccessState');
-  const cvErrorState    = document.getElementById('cvErrorState');
-  const cvSubmitBtn     = document.getElementById('cvSubmitBtn');
-  const cvBtnText       = document.getElementById('cvBtnText');
-  const cvBtnSpinner    = document.getElementById('cvBtnSpinner');
+  const cvModal        = document.getElementById('cvModal');
+  const cvForm         = document.getElementById('cvForm');
+  const cvFormState    = document.getElementById('cvFormState');
+  const cvSuccessState = document.getElementById('cvSuccessState');
+  const cvErrorState   = document.getElementById('cvErrorState');
+  const cvSubmitBtn    = document.getElementById('cvSubmitBtn');
+  const cvBtnText      = document.getElementById('cvBtnText');
+  const cvBtnSpinner   = document.getElementById('cvBtnSpinner');
 
-  // Open CV modal from About CTAs
   document.getElementById('openCvForm')?.addEventListener('click', (e) => {
     e.preventDefault();
     openModal(cvModal);
@@ -360,44 +464,39 @@ loadJobs();
     openModal(cvModal);
   });
 
-  // Close CV modal
   document.getElementById('closeCvModal')?.addEventListener('click', () => closeModal(cvModal));
 
-  // --- Preferred Locations: show "Other" text input ---
-  const otherCitiesRow = document.getElementById('otherCitiesRow');
-  document.querySelectorAll('input[name="cv-locations"]').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const hasOther = Array.from(document.querySelectorAll('input[name="cv-locations"]:checked'))
-        .some(c => c.value === 'Other');
-      if (otherCitiesRow) otherCitiesRow.style.display = hasOther ? 'grid' : 'none';
-    });
-  });
-
-  // --- File upload (CV form) ---
-  const cvFileInput  = document.getElementById('cv-file');
-  const cvFileDrop  = document.getElementById('cvFileDrop');
-  const cvFilePreview = document.getElementById('cvFilePreview');
-  const cvFileName  = document.getElementById('cvFileName');
+  // File upload (CV form)
+  const cvFileInput = document.getElementById('cv-file');
+  const cvFileDrop  = document.getElementById('cv-file-drop');
 
   function showCvFile(file) {
-    cvFileName.textContent = file.name;
-    cvFileDrop.style.display  = 'none';
-    cvFilePreview.style.display = 'flex';
+    if (!cvFileDrop) return;
+    cvFileDrop.classList.add('has-file');
+    const content = cvFileDrop.querySelector('.file-upload__content p');
+    if (content) content.innerHTML = `<strong>${escapeHtml(file.name)}</strong> (${(file.size / 1024).toFixed(0)} KB)`;
+    const removeBtn = cvFileDrop.querySelector('.file-upload__remove');
+    if (removeBtn) removeBtn.style.display = 'inline-block';
   }
 
   function clearCvFile() {
+    if (!cvFileDrop || !cvFileInput) return;
     cvFileInput.value = '';
-    cvFileDrop.style.display   = 'flex';
-    cvFilePreview.style.display = 'none';
+    cvFileDrop.classList.remove('has-file');
+    const content = cvFileDrop.querySelector('.file-upload__content p');
+    if (content) content.innerHTML = `<strong>Choose a file</strong> or drag & drop`;
+    const removeBtn = cvFileDrop.querySelector('.file-upload__remove');
+    if (removeBtn) removeBtn.style.display = 'none';
   }
 
-  if (cvFileInput) {
-    cvFileInput.addEventListener('change', () => {
-      if (cvFileInput.files[0]) showCvFile(cvFileInput.files[0]);
-    });
-  }
-
-  document.getElementById('removeCvFile')?.addEventListener('click', clearCvFile);
+  cvFileDrop?.addEventListener('click', () => cvFileInput?.click());
+  cvFileInput?.addEventListener('change', () => {
+    if (cvFileInput.files[0]) showCvFile(cvFileInput.files[0]);
+  });
+  cvFileDrop?.querySelector('.file-upload__remove')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    clearCvFile();
+  });
 
   if (cvFileDrop) {
     cvFileDrop.addEventListener('dragover', (e) => { e.preventDefault(); cvFileDrop.classList.add('is-dragging'); });
@@ -418,15 +517,8 @@ loadJobs();
   // --- CV Form validation ---
   function validateCvForm() {
     let valid = true;
-    const err = (id, msg) => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = msg; el.classList.add('show'); }
-      valid = false;
-    };
-    const clear = (id) => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = ''; el.classList.remove('show'); }
-    };
+    const err   = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add('show'); } valid = false; };
+    const clear = (id)      => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.classList.remove('show'); } };
 
     clear('err-cv-name'); clear('err-cv-email'); clear('err-cv-file');
 
@@ -434,236 +526,78 @@ loadJobs();
     const email = document.getElementById('cv-email')?.value.trim();
     const file  = cvFileInput?.files[0];
 
-    if (!name) err('err-cv-name', 'Full Name is required');
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-cv-email', 'Valid email is required');
-    if (!file) err('err-cv-file', 'Please attach your CV');
-    else if (file.size > 5 * 1024 * 1024) err('err-cv-file', 'File too large (max 5 MB)');
-    else if (!['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type))
-      err('err-cv-file', 'Only PDF, DOC or DOCX allowed');
+    if (!name)  err('err-cv-name',  'Full name is required.');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-cv-email', 'Valid email is required.');
+    if (!file)  err('err-cv-file',  'Please attach your CV.');
 
     return valid;
   }
 
-    // --- CV Form submit ---
-  if (cvForm) {
-    cvForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!validateCvForm()) return;
+  cvForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateCvForm()) return;
 
-      cvBtnText.style.display    = 'none';
-      cvBtnSpinner.style.display  = 'inline-block';
-      cvSubmitBtn.disabled        = true;
+    cvSubmitBtn.disabled        = true;
+    if (cvBtnText)    cvBtnText.style.display    = 'none';
+    if (cvBtnSpinner) cvBtnSpinner.style.display = 'inline-block';
+
+    try {
+      const languages = [...document.querySelectorAll('input[name="languages"]:checked')].map(c => c.value).join(', ');
+      const locations = [...document.querySelectorAll('input[name="locations"]:checked')].map(c => c.value).join(', ');
 
       const formData = new FormData();
-      formData.append('fullName',      document.getElementById('cv-name')?.value.trim());
-      formData.append('email',         document.getElementById('cv-email')?.value.trim());
-      formData.append('phone',         document.getElementById('cv-phone')?.value.trim());
-      formData.append('jobFunction',   document.getElementById('cv-job-function')?.value);
-      formData.append('targetedRoles', document.getElementById('cv-targeted-roles')?.value.trim());
-      formData.append('subject',       document.getElementById('cv-subject')?.value);
-      formData.append('experience',    document.getElementById('cv-experience')?.value);
-      formData.append('qualification', document.getElementById('cv-qualification')?.value);
-      formData.append('skills',        document.getElementById('cv-skills')?.value.trim());
-      formData.append('languages',     Array.from(document.querySelectorAll('input[name="cv-languages"]:checked')).map(c => c.value).join(', '));
-      formData.append('expectedSalary',document.getElementById('cv-salary')?.value.trim());
-      formData.append('locations',     Array.from(document.querySelectorAll('input[name="cv-locations"]:checked')).map(c => c.value).join(', '));
-      formData.append('otherLocation', document.getElementById('cv-other-location')?.value.trim());
-      formData.append('notes',         document.getElementById('cv-notes')?.value.trim());
+      // Clés alignées exactement sur les colonnes DB_talents
+      formData.append('fullName',       document.getElementById('cv-name')?.value.trim()         || '');
+      formData.append('email',          document.getElementById('cv-email')?.value.trim()        || '');
+      formData.append('phone',          document.getElementById('cv-phone')?.value.trim()        || '');
+      formData.append('subject',        document.getElementById('cv-subject')?.value.trim()      || '');
+      formData.append('jobFunction',    document.getElementById('cv-function')?.value.trim()     || '');
+      formData.append('targetedRoles',  document.getElementById('cv-targeted-roles')?.value.trim()|| '');
+      formData.append('experience',     document.getElementById('cv-experience')?.value          || '');
+      formData.append('qualification',  document.getElementById('cv-qualification')?.value       || '');
+      formData.append('skills',         document.getElementById('cv-skills')?.value.trim()       || '');
+      formData.append('languages',      languages);
+      formData.append('expectedSalary', document.getElementById('cv-salary')?.value.trim()       || '');
+      formData.append('locations',      locations);
+      formData.append('notes',          document.getElementById('cv-notes')?.value.trim()        || '');
+      formData.append('driveFolder',    DRIVE_FOLDER);
+
       if (cvFileInput?.files[0]) {
         formData.append('cv', cvFileInput.files[0]);
       }
 
-      try {
-        const res = await fetch(CV_WEBHOOK, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Webhook error');
-        cvFormState.style.display    = 'none';
-        cvSuccessState.style.display = 'flex';
-      } catch (err) {
-        console.error(err);
-        cvFormState.style.display  = 'none';
-        cvErrorState.style.display = 'flex';
-      } finally {
-        cvBtnText.style.display    = 'inline';
-        cvBtnSpinner.style.display = 'none';
-        cvSubmitBtn.disabled       = false;
+      const res = await fetch(CV_WEBHOOK, { method: 'POST', body: formData });
+
+      if (res.ok) {
+        if (cvFormState)    cvFormState.style.display    = 'none';
+        if (cvSuccessState) cvSuccessState.style.display = 'block';
+        if (cvErrorState)   cvErrorState.style.display   = 'none';
+      } else {
+        throw new Error(`HTTP ${res.status}`);
       }
-    }); // ← fin addEventListener
-
-    document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
-      cvErrorState.style.display  = 'none';
-      cvFormState.style.display   = 'block';
-    });
-
-    document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
-      closeModal(cvModal);
-      setTimeout(() => {
-        cvSuccessState.style.display = 'none';
-        cvFormState.style.display    = 'block';
-        cvForm?.reset();
-        clearCvFile();
-      }, 300);
-    });
-
-  } // ← fin if (cvForm)
-
-
-  // ============================================================
-  // APPLY MODAL — Apply to a specific job
-  // ============================================================
-  const applyModal = document.getElementById('applyModal');
-  const applyForm  = document.getElementById('applyForm');
-  const applyStatus = document.getElementById('formStatus');
-
-  document.getElementById('closeApplyModal')?.addEventListener('click', () => {
-    closeModal(applyModal);
-    applyForm?.reset();
-    if (applyStatus) { applyStatus.style.display = 'none'; }
+    } catch (err) {
+      console.error('[CV] Error:', err);
+      if (cvFormState)    cvFormState.style.display    = 'none';
+      if (cvSuccessState) cvSuccessState.style.display = 'none';
+      if (cvErrorState)   cvErrorState.style.display   = 'block';
+    } finally {
+      cvSubmitBtn.disabled        = false;
+      if (cvBtnText)    cvBtnText.style.display    = 'inline';
+      if (cvBtnSpinner) cvBtnSpinner.style.display = 'none';
+    }
   });
 
-  document.getElementById('openApplyForm')?.addEventListener('click', () => {
-    const jobTitle = document.getElementById('jobModalTitle')?.textContent || '';
-    const titleInput = document.getElementById('applyJobTitle');
-    if (titleInput) titleInput.value = jobTitle;
-    closeModal(jobModal);
-    openModal(applyModal);
+  document.getElementById('cvSuccessClose')?.addEventListener('click', () => {
+    closeModal(cvModal);
+    cvForm?.reset();
+    clearCvFile();
+    if (cvFormState)    cvFormState.style.display    = 'block';
+    if (cvSuccessState) cvSuccessState.style.display = 'none';
   });
 
-  // --- Apply: file upload ---
-  const applyFileInput = document.getElementById('applyCV');
-  const applyFileUpload = document.getElementById('applyFileUpload');
-
-  function handleApplyFile(file) {
-    const allowed = ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowed.includes(file.type)) { alert('Only PDF, DOC or DOCX allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { alert('File must be under 5 MB'); return; }
-
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    applyFileInput.files = dt.files;
-
-    applyFileUpload.classList.add('has-file');
-    applyFileUpload.querySelector('.file-upload__content').innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-      <p><strong>${file.name}</strong></p>
-      <p class="file-upload__hint">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
-      <button type="button" class="file-upload__remove">Remove</button>
-    `;
-    applyFileUpload.querySelector('.file-upload__remove')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      applyFileInput.value = '';
-      applyFileUpload.classList.remove('has-file');
-      applyFileUpload.querySelector('.file-upload__content').innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p><strong>Click to upload</strong> or drag and drop</p>
-        <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
-      `;
-    });
-  }
-
-  if (applyFileUpload && applyFileInput) {
-    applyFileUpload.addEventListener('click', (e) => {
-      if (!e.target.closest('.file-upload__remove')) applyFileInput.click();
-    });
-    applyFileInput.addEventListener('change', (e) => {
-      if (e.target.files[0]) handleApplyFile(e.target.files[0]);
-    });
-    applyFileUpload.addEventListener('dragover', (e) => { e.preventDefault(); applyFileUpload.classList.add('is-dragover'); });
-    applyFileUpload.addEventListener('dragleave', () => applyFileUpload.classList.remove('is-dragover'));
-    applyFileUpload.addEventListener('drop', (e) => {
-      e.preventDefault();
-      applyFileUpload.classList.remove('is-dragover');
-      if (e.dataTransfer.files[0]) handleApplyFile(e.dataTransfer.files[0]);
-    });
-  }
-
-  // --- Apply form submit ---
-  function validateApplyForm() {
-    let valid = true;
-    const err = (id, msg) => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = msg; el.classList.add('show'); }
-      valid = false;
-    };
-    const clear = (id) => {
-      const el = document.getElementById(id);
-      if (el) { el.textContent = ''; el.classList.remove('show'); }
-    };
-
-    clear('err-apply-name'); clear('err-apply-email'); clear('err-apply-phone');
-    clear('err-apply-subject'); clear('err-apply-experience'); clear('err-apply-cv');
-
-    const name  = document.getElementById('applyFullName')?.value.trim();
-    const email = document.getElementById('applyEmail')?.value.trim();
-    const phone = document.getElementById('applyPhone')?.value.trim();
-    const subject = document.getElementById('applySubject')?.value;
-    const experience = document.getElementById('applyExperience')?.value;
-    const file = applyFileInput?.files[0];
-
-    if (!name) err('err-apply-name', 'Full Name is required');
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) err('err-apply-email', 'Valid email is required');
-    if (!phone) err('err-apply-phone', 'Phone Number is required');
-    if (!subject) err('err-apply-subject', 'Please select a subject');
-    if (!experience) err('err-apply-experience', 'Years of experience is required');
-    if (!file) err('err-apply-cv', 'Please attach your CV');
-    else if (file.size > 5 * 1024 * 1024) err('err-apply-cv', 'File too large (max 5 MB)');
-
-    return valid;
-  }
-
-  if (applyForm) {
-    applyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!validateApplyForm()) return;
-
-      const submitBtn = document.getElementById('applySubmitBtn');
-      const origText  = submitBtn.textContent;
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting…';
-
-      const formData = new FormData(applyForm);
-      formData.set('languages', Array.from(document.querySelectorAll('input[name="apply-languages"]:checked')).map(c => c.value).join(', '));
-      formData.set('locations', Array.from(document.querySelectorAll('input[name="apply-locations"]:checked')).map(c => c.value).join(', '));
-
-      try {
-        const res = await fetch(APPLY_WEBHOOK, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Error');
-        if (applyStatus) {
-          applyStatus.textContent = '✓ Application submitted! I will review your profile and contact you within 48 hours.';
-          applyStatus.className = 'form-status success';
-          applyStatus.style.display = 'block';
-        }
-        applyForm.reset();
-        applyFileUpload?.classList.remove('has-file');
-        if (applyFileUpload) {
-          applyFileUpload.querySelector('.file-upload__content').innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            <p><strong>Click to upload</strong> or drag and drop</p>
-            <p class="file-upload__hint">PDF, DOC or DOCX (max 5MB)</p>
-          `;
-        }
-        setTimeout(() => closeModal(applyModal), 2000);
-      } catch (err) {
-        console.error(err);
-        if (applyStatus) {
-          applyStatus.textContent = 'Something went wrong. Please try again or contact me directly.';
-          applyStatus.className = 'form-status error';
-          applyStatus.style.display = 'block';
-        }
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = origText;
-      }
-    });
-  }
+  document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
+    if (cvFormState)   cvFormState.style.display   = 'block';
+    if (cvErrorState)  cvErrorState.style.display  = 'none';
+  });
 
 }); // end DOMContentLoaded
