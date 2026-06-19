@@ -252,12 +252,10 @@ function applyFilters() {
 async function loadJobs() {
   showState('loading');
   try {
-    const res = await fetch(SHEET_VACANCIES_URL, {
-  cache: 'no-store',
-  mode: 'cors'
-});
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const raw = await res.text();
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_VACANCIES_URL)}`;
+const res = await fetch(proxyUrl);
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+const raw = await res.text();
 
     // DEBUG — voir ce qu'on reçoit
     console.log('[DEBUG] raw CSV (first 500 chars):', raw.substring(0, 500));
