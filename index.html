@@ -458,81 +458,65 @@
           </div>
         </div>
 
-       <!-- Row 3 : Job Function + Subject -->
-<div class="form-row">
-  <div class="form-group">
-    <label for="cv-job-function">Job Function</label>
-    <select id="cv-job-function" name="jobFunction">
-      <option value="">— Select —</option>
-      <option value="Teaching & Academic">Teaching & Academic</option>
-      <option value="School Leadership & Management">School Leadership & Management</option>
-      <option value="Finance & Accounting">Finance & Accounting</option>
-      <option value="IT & Systems">IT & Systems</option>
-      <option value="Human Resources">Human Resources</option>
-      <option value="Facilities & Operations">Facilities & Operations</option>
-      <option value="Marketing & Admissions">Marketing & Admissions</option>
-      <option value="Other (Support Staff)">Other (Support Staff)</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="cv-subject">Subject / Specialisation</label>
-    <select id="cv-subject" name="subject">
-      <option value="">— Select —</option>
-      <option>English</option>
-      <option>Mathematics</option>
-      <option>Science</option>
-      <option>Physics</option>
-      <option>Chemistry</option>
-      <option>Biology</option>
-      <option>History</option>
-      <option>Geography</option>
-      <option>ICT / Computing</option>
-      <option>Arts</option>
-      <option>Physical Education</option>
-      <option>Business Studies</option>
-      <option>Economics</option>
-      <option>Mandarin Chinese</option>
-      <option>Malay</option>
-      <option>Early Childhood</option>
-      <option>Special Education Needs</option>
-      <option>School Administration</option>
-      <option>Other</option>
-    </select>
-  </div>
-</div>
-
-<!-- Row 4 : Experience + Qualification -->
-<div class="form-row">
-  <div class="form-group">
-    <label for="cv-experience">Years of Relevant Experience</label>
-    <select id="cv-experience" name="experience">
-      <option value="">— Select —</option>
-      <option value="<1">Less than 1 year</option>
-      <option value="1-2">1 – 2 years</option>
-      <option value="3-5">3 – 5 years</option>
-      <option value="5-10">5 – 10 years</option>
-      <option value="10+">More than 10 years</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="cv-qualification">Highest Qualification</label>
-    <select id="cv-qualification" name="qualification">
-      <option value="">— Select —</option>
-      <option>Bachelor's Degree</option>
-      <option>Master's Degree</option>
-      <option>PhD</option>
-      <option>Teaching Certificate</option>
-      <option>Other</option>
-    </select>
-  </div>
-</div>
-
-
-        <!-- Row 5 : Qualification + Salary -->
+        <!-- Row 3 : Job Function + Subject -->
         <div class="form-row">
           <div class="form-group">
+            <label for="cv-job-function">Job Function</label>
+            <select id="cv-job-function" name="jobFunction" autocomplete="off">
+              <option value="">— Select —</option>
+              <option value="Teaching & Academic">Teaching & Academic</option>
+              <option value="School Leadership & Management">School Leadership & Management</option>
+              <option value="Finance & Accounting">Finance & Accounting</option>
+              <option value="IT & Systems">IT & Systems</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Facilities & Operations">Facilities & Operations</option>
+              <option value="Marketing & Admissions">Marketing & Admissions</option>
+              <option value="Other (Support Staff)">Other (Support Staff)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cv-subject">Subject / Specialisation</label>
+            <select id="cv-subject" name="subject" autocomplete="off">
+              <option value="">— Select —</option>
+              <option>English</option>
+              <option>Mathematics</option>
+              <option>Science</option>
+              <option>Physics</option>
+              <option>Chemistry</option>
+              <option>Biology</option>
+              <option>History</option>
+              <option>Geography</option>
+              <option>ICT / Computing</option>
+              <option>Arts</option>
+              <option>Physical Education</option>
+              <option>Business Studies</option>
+              <option>Economics</option>
+              <option>Mandarin Chinese</option>
+              <option>Malay</option>
+              <option>Early Childhood</option>
+              <option>Special Education Needs</option>
+              <option>School Administration</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 4 : Experience + Qualification -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-experience">Years of Relevant Experience</label>
+            <select id="cv-experience" name="experience" autocomplete="off">
+              <option value="">— Select —</option>
+              <option value="<1">Less than 1 year</option>
+              <option value="1-2">1 – 2 years</option>
+              <option value="3-5">3 – 5 years</option>
+              <option value="5-10">5 – 10 years</option>
+              <option value="10+">More than 10 years</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label for="cv-qualification">Highest Qualification</label>
-            <select id="cv-qualification" name="qualification">
+            <select id="cv-qualification" name="qualification" autocomplete="off">
               <option value="">— Select —</option>
               <option>Bachelor's Degree</option>
               <option>Master's Degree</option>
@@ -541,9 +525,13 @@
               <option>Other</option>
             </select>
           </div>
+        </div>
+
+        <!-- Row 5 : Salary -->
+        <div class="form-row">
           <div class="form-group">
             <label for="cv-salary">Expected Annual Salary (RM, Gross)</label>
-            <input type="text" id="cv-salary" name="expectedSalary" placeholder="e.g. 60000" />
+            <input type="text" id="cv-salary" name="expectedSalary" placeholder="e.g. 60000" autocomplete="off" />
           </div>
         </div>
 
@@ -656,5 +644,3 @@
 
   </div>
 </div>
-
-</html>
