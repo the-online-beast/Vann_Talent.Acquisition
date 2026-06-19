@@ -275,9 +275,6 @@
 </div>
 
 <!-- ============================================================
-     MODAL — APPLY FORM (logique n8n à venir étape 5)
-============================================================ -->
-<!-- ============================================================
      MODAL — APPLY FORM
 ============================================================ -->
 <div class="modal-overlay" id="applyModal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
@@ -288,79 +285,45 @@
 
     <form id="applyForm" class="apply-form">
 
-      <!-- Status Message -->
       <div class="form-status" id="formStatus" style="display: none;"></div>
 
       <!-- Row 1: Full Name + Email -->
       <div class="form-row">
         <div class="form-group">
-          <label for="applyFullName">Full Name *</label>
-          <input 
-            type="text" 
-            id="applyFullName" 
-            name="fullName"
-            placeholder="Your full name"
-            required
-          />
+          <label for="applyFullName">Full Name <span class="required">*</span></label>
+          <input type="text" id="applyFullName" name="fullName" placeholder="Your full name" required autocomplete="name" />
         </div>
         <div class="form-group">
-          <label for="applyEmail">Email *</label>
-          <input 
-            type="email" 
-            id="applyEmail" 
-            name="email"
-            placeholder="your@email.com"
-            required
-          />
+          <label for="applyEmail">Email <span class="required">*</span></label>
+          <input type="email" id="applyEmail" name="email" placeholder="ahmad@email.com" required autocomplete="email" />
         </div>
       </div>
 
       <!-- Row 2: Phone + Years of Experience -->
       <div class="form-row">
         <div class="form-group">
-          <label for="applyPhone">Phone Number *</label>
-          <input 
-            type="tel" 
-            id="applyPhone" 
-            name="phone"
-            placeholder="+60 12 345 6789"
-            required
-          />
+          <label for="applyPhone">Phone Number <span class="required">*</span></label>
+          <input type="tel" id="applyPhone" name="phone" placeholder="+60 12 345 6789" required autocomplete="tel" />
         </div>
         <div class="form-group">
-          <label for="applyExperience">Years of Experience *</label>
-          <input 
-            type="number" 
-            id="applyExperience" 
-            name="experience"
-            placeholder="e.g. 5"
-            min="0"
-            max="50"
-            required
-          />
+          <label for="applyExperience">Years of Experience <span class="required">*</span></label>
+          <input type="number" id="applyExperience" name="experience" placeholder="e.g. 5" min="0" max="50" required autocomplete="off" />
         </div>
       </div>
 
-            <!-- Row 2a: Job Position -->
+      <!-- Row 2a: Job Position (readonly, auto-filled) -->
       <div class="form-row">
         <div class="form-group">
-          <label for="applyJobTitle">Ideal Job Title *</label>
-          <input 
-            type="text" 
-            id="applyJobTitle" 
-            name="jobTitle"
-            placeholder="e.g. Mathematics Teacher"
-            readonly
-          />
+          <label for="applyJobTitle">Position Applied For</label>
+          <input type="text" id="applyJobTitle" name="jobTitle" placeholder="e.g. Mathematics Teacher" readonly autocomplete="off" />
         </div>
       </div>
-
 
       <!-- Row 3: Education Level -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label for="applyEducationLevel">Highest Qualification *</label>
-          <select id="applyEducationLevel" name="educationLevel" required>
+          <label for="applyEducationLevel">Highest Qualification <span class="required">*</span></label>
+          <select id="applyEducationLevel" name="educationLevel" required autocomplete="off">
             <option value="">Select your qualification</option>
             <option value="Bachelor's Degree">Bachelor's Degree</option>
             <option value="Master's Degree">Master's Degree</option>
@@ -371,11 +334,11 @@
         </div>
       </div>
 
-      <!-- Row 4: Teaching Subject/Specialisation -->
+      <!-- Row 4: Subject / Specialisation (optional) -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label for="applySubject">Subject / Specialisation *</label>
-          <select id="applySubject" name="subject" required>
+          <label for="applySubject">Subject / Specialisation</label>
+          <select id="applySubject" name="subject" autocomplete="off">
             <option value="">Select subject area</option>
             <option value="English">English</option>
             <option value="Mathematics">Mathematics</option>
@@ -397,52 +360,26 @@
         </div>
       </div>
 
-      <!-- Row 5: Key Skills / Competencies -->
+      <!-- Row 5: Key Skills (optional) -->
       <div class="form-row">
         <div class="form-group full-width">
           <label for="applySkills">Key Skills & Competencies</label>
-          <textarea 
-            id="applySkills" 
-            name="skills"
-            placeholder="e.g. Curriculum design, Assessment, Project-based learning, Special needs support..."
-            rows="3"
-          ></textarea>
+          <textarea id="applySkills" name="skills" placeholder="e.g. Curriculum design, Assessment, Project-based learning..." rows="3" autocomplete="off"></textarea>
         </div>
       </div>
 
       <!-- Row 6: Languages -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label>Languages (Professional Level) *</label>
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="English" />
-              English
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="Mandarin Chinese" />
-              Mandarin Chinese
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="Malay" />
-              Malay
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="Tamil" />
-              Tamil
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="French" />
-              French
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="Spanish" />
-              Spanish
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="languages" value="German" />
-              German
-            </label>
+          <label id="apply-languages-label">Languages (Professional Level) <span class="required">*</span></label>
+          <div class="checkbox-group" role="group" aria-labelledby="apply-languages-label">
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="English" /> English</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="Mandarin Chinese" /> Mandarin Chinese</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="Malay" /> Malay</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="Tamil" /> Tamil</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="French" /> French</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="Spanish" /> Spanish</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-languages" value="German" /> German</label>
           </div>
           <small id="languagesError" class="form-error"></small>
         </div>
@@ -451,15 +388,15 @@
       <!-- Row 7: Expected Salary -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label for="applySalary">Expected Annual Salary (Gross) *</label>
-          <select id="applySalary" name="salary" required>
+          <label for="applySalary">Expected Annual Salary (Gross) <span class="required">*</span></label>
+          <select id="applySalary" name="salary" required autocomplete="off">
             <option value="">Select salary range (MYR)</option>
             <option value="Below RM30,000">Below RM30,000</option>
-            <option value="RM30,000 - RM40,000">RM30,000 - RM40,000</option>
-            <option value="RM40,000 - RM50,000">RM40,000 - RM50,000</option>
-            <option value="RM50,000 - RM60,000">RM50,000 - RM60,000</option>
-            <option value="RM60,000 - RM80,000">RM60,000 - RM80,000</option>
-            <option value="RM80,000 - RM100,000">RM80,000 - RM100,000</option>
+            <option value="RM30,000 - RM40,000">RM30,000 – RM40,000</option>
+            <option value="RM40,000 - RM50,000">RM40,000 – RM50,000</option>
+            <option value="RM50,000 - RM60,000">RM50,000 – RM60,000</option>
+            <option value="RM60,000 - RM80,000">RM60,000 – RM80,000</option>
+            <option value="RM80,000 - RM100,000">RM80,000 – RM100,000</option>
             <option value="RM100,000+">RM100,000+</option>
           </select>
         </div>
@@ -468,32 +405,14 @@
       <!-- Row 8: Preferred Locations -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label>Preferred Location(s) *</label>
-          <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Kuala Lumpur" />
-              Kuala Lumpur
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Selangor" />
-              Selangor
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Penang" />
-              Penang
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Johor Bahru" />
-              Johor Bahru
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Singapore" />
-              Singapore
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" name="locations" value="Remote / Hybrid" />
-              Remote / Hybrid
-            </label>
+          <label id="apply-locations-label">Preferred Location(s) <span class="required">*</span></label>
+          <div class="checkbox-group" role="group" aria-labelledby="apply-locations-label">
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Kuala Lumpur" /> Kuala Lumpur</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Selangor" /> Selangor</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Penang" /> Penang</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Johor Bahru" /> Johor Bahru</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Singapore" /> Singapore</label>
+            <label class="checkbox-label"><input type="checkbox" name="apply-locations" value="Remote / Hybrid" /> Remote / Hybrid</label>
           </div>
           <small id="locationsError" class="form-error"></small>
         </div>
@@ -502,15 +421,9 @@
       <!-- Row 9: CV Upload -->
       <div class="form-row">
         <div class="form-group full-width">
-          <label for="applyCV">Upload your CV *</label>
+          <label for="applyCV">Upload your CV <span class="required">*</span></label>
           <div class="file-upload" id="fileUpload">
-            <input 
-              type="file" 
-              id="applyCV" 
-              name="cv"
-              accept=".pdf,.doc,.docx"
-              required
-            />
+            <input type="file" id="applyCV" name="cv" accept=".pdf,.doc,.docx" required autocomplete="off" />
             <div class="file-upload__content">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -524,20 +437,15 @@
         </div>
       </div>
 
-      <!-- Row 10: Additional Notes -->
+      <!-- Row 10: Additional Notes (optional) -->
       <div class="form-row">
         <div class="form-group full-width">
           <label for="applyNotes">Additional Information</label>
-          <textarea 
-            id="applyNotes" 
-            name="notes"
-            placeholder="Any other relevant information about your background or preferences..."
-            rows="2"
-          ></textarea>
+          <textarea id="applyNotes" name="notes" placeholder="Any other relevant information about your background or preferences..." rows="2" autocomplete="off"></textarea>
         </div>
       </div>
 
-      <!-- Submit Button -->
+      <!-- Submit -->
       <div class="form-actions">
         <button type="submit" class="btn btn--solid" id="applySubmitBtn">
           Submit Application
@@ -548,48 +456,44 @@
       </div>
 
     </form>
-
   </div>
 </div>
 
 
+<!-- ============================================================
+     SECTION 3 — CONTACT / FOOTER
+============================================================ -->
+<section id="contact" class="section contact">
+  <div class="container">
+    <p class="placeholder-text">— Contact section coming next —</p>
+  </div>
+</section>
 
-    <!-- ============================================================
-         SECTION 3 — CONTACT / FOOTER (placeholder)
-    ============================================================ -->
-    <section id="contact" class="section contact">
-      <div class="container">
-        <p class="placeholder-text">— Contact section coming next —</p>
-      </div>
-    </section>
+</main>
 
-  </main>
-
-  <!-- ============================================================
-       MODAL — CV FORM (structure, logique n8n à venir étape 4)
-  ============================================================ -->
-  <div class="modal-overlay" id="cvModal" role="dialog" aria-modal="true" aria-labelledby="cvModalTitle">
+<!-- ============================================================
+     MODAL — CV FORM (Passive candidates)
+============================================================ -->
+<div class="modal-overlay" id="cvModal" role="dialog" aria-modal="true" aria-labelledby="cvModalTitle">
   <div class="modal modal--large">
     <button class="modal__close" id="closeCvModal" aria-label="Close">✕</button>
 
     <!-- État : Formulaire -->
     <div id="cvFormState">
       <h2 class="modal__title" id="cvModalTitle">Submit your CV</h2>
-      <p class="modal__subtitle">
-        I will review your profile and get in touch when a relevant role comes up.
-      </p>
+      <p class="modal__subtitle">I will review your profile and get in touch when a relevant role comes up.</p>
 
       <form id="cvForm" class="cv-form" novalidate>
 
         <div class="form-row">
           <div class="form-group">
             <label for="cv-name">Full Name <span class="required">*</span></label>
-            <input type="text" id="cv-name" name="fullName" placeholder="Jane Smith" required />
+            <input type="text" id="cv-name" name="fullName" placeholder="Jane Smith" required autocomplete="name" />
             <span class="form-error" id="err-name"></span>
           </div>
           <div class="form-group">
             <label for="cv-email">Email Address <span class="required">*</span></label>
-            <input type="email" id="cv-email" name="email" placeholder="jane@email.com" required />
+            <input type="email" id="cv-email" name="email" placeholder="jane@email.com" required autocomplete="email" />
             <span class="form-error" id="err-email"></span>
           </div>
         </div>
@@ -597,23 +501,23 @@
         <div class="form-row">
           <div class="form-group">
             <label for="cv-phone">Phone Number</label>
-            <input type="text" id="cv-phone" name="phone" placeholder="+60 12 345 6789" />
+            <input type="tel" id="cv-phone" name="phone" placeholder="+60 12 345 6789" autocomplete="tel" />
           </div>
           <div class="form-group">
             <label for="cv-location">Current Location</label>
-            <input type="text" id="cv-location" name="location" placeholder="Kuala Lumpur" />
+            <input type="text" id="cv-location" name="location" placeholder="Kuala Lumpur" autocomplete="address-level2" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="cv-position">Position Sought <span class="required">*</span></label>
-            <input type="text" id="cv-position" name="position" placeholder="English Teacher" required />
+            <input type="text" id="cv-position" name="position" placeholder="English Teacher" required autocomplete="organization-title" />
             <span class="form-error" id="err-position"></span>
           </div>
           <div class="form-group">
             <label for="cv-subject">Subject Area</label>
-            <select id="cv-subject" name="subject">
+            <select id="cv-subject" name="subject" autocomplete="off">
               <option value="">— Select —</option>
               <option>English</option>
               <option>Mathematics</option>
@@ -633,11 +537,11 @@
         <div class="form-row">
           <div class="form-group">
             <label for="cv-experience">Years of Experience</label>
-            <input type="number" id="cv-experience" name="experience" min="0" max="50" placeholder="3" />
+            <input type="number" id="cv-experience" name="experience" min="0" max="50" placeholder="3" autocomplete="off" />
           </div>
           <div class="form-group">
             <label for="cv-availability">Availability</label>
-            <select id="cv-availability" name="availability">
+            <select id="cv-availability" name="availability" autocomplete="off">
               <option value="">— Select —</option>
               <option>Immediately</option>
               <option>Within 1 month</option>
@@ -649,17 +553,15 @@
 
         <div class="form-group">
           <label for="cv-note">Cover Note</label>
-          <textarea id="cv-note" name="coverNote" rows="3"
-            placeholder="Brief intro — who you are, what you are looking for…"></textarea>
+          <textarea id="cv-note" name="coverNote" rows="3" placeholder="Brief intro — who you are, what you are looking for…" autocomplete="off"></textarea>
         </div>
 
         <div class="form-group">
           <label for="cv-file">Upload your CV <span class="required">*</span></label>
           <div class="file-drop" id="fileDrop">
-            <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" required />
+            <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" required autocomplete="off" />
             <div class="file-drop__ui" id="fileDropUI">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="1.8" width="28" height="28">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="17 8 12 3 7 8"/>
                 <line x1="12" y1="3" x2="12" y2="15"/>
@@ -702,9 +604,5 @@
   </div>
 </div>
 
-
-  
-
 </body>
 </html>
-
