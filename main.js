@@ -252,7 +252,7 @@ function applyFilters() {
 async function loadJobs() {
   showState('loading');
   try {
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_VACANCIES_URL)}`;
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(SHEET_VACANCIES_URL)}`;
 const res = await fetch(proxyUrl);
 if (!res.ok) throw new Error(`HTTP ${res.status}`);
 const raw = await res.text();
