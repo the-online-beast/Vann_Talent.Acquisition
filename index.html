@@ -415,206 +415,244 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       MODAL — CV FORM (Passive candidates)
-  ============================================================ -->
-  <div class="modal-overlay" id="cvModal" role="dialog" aria-modal="true">
-    <div class="modal modal--large">
-      <button class="modal__close" id="closeCvModal" aria-label="Close">✕</button>
+<!-- ============================================================
+     MODAL — CV FORM (Passive candidates)
+============================================================ -->
+<div class="modal-overlay" id="cvModal" role="dialog" aria-modal="true">
+  <div class="modal modal--large">
+    <button class="modal__close" id="closeCvModal" aria-label="Close">✕</button>
 
-      <!-- Form state -->
-      <div id="cvFormState">
-        <h2 class="modal__title">Submit your CV</h2>
-        <p class="modal__subtitle">
-          I will review your profile and get in touch when a relevant role comes up.
-        </p>
+    <!-- Form state -->
+    <div id="cvFormState">
+      <h2 class="modal__title">Submit your CV</h2>
+      <p class="modal__subtitle">
+        I will review your profile and get in touch when a relevant role comes up.
+      </p>
 
-        <form id="cvForm" class="cv-form" novalidate>
+      <form id="cvForm" class="cv-form" novalidate>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cv-name">Full Name <span class="required">*</span></label>
-              <input type="text" id="cv-name" name="fullName" placeholder="Jane Smith" required />
-              <small class="form-error" id="err-cv-name"></small>
-            </div>
-            <div class="form-group">
-              <label for="cv-email">Email Address <span class="required">*</span></label>
-              <input type="email" id="cv-email" name="email" placeholder="jane@email.com" required />
-              <small class="form-error" id="err-cv-email"></small>
+        <!-- Row 1 : Full Name + Email -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-name">Full Name <span class="required">*</span></label>
+            <input type="text" id="cv-name" name="fullName" placeholder="Jane Smith" required />
+            <small class="form-error" id="err-cv-name"></small>
+          </div>
+          <div class="form-group">
+            <label for="cv-email">Email Address <span class="required">*</span></label>
+            <input type="email" id="cv-email" name="email" placeholder="jane@email.com" required />
+            <small class="form-error" id="err-cv-email"></small>
+          </div>
+        </div>
+
+        <!-- Row 2 : Phone + Targeted Roles -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-phone">Phone Number <span class="required">*</span></label>
+            <input type="tel" id="cv-phone" name="phone" placeholder="+60 12 345 6789" required />
+            <small class="form-error" id="err-cv-phone"></small>
+          </div>
+          <div class="form-group">
+            <label for="cv-targeted-roles">Targeted Role(s)</label>
+            <input type="text" id="cv-targeted-roles" name="targetedRoles" placeholder="e.g. Head of Science, Year 4 Teacher" />
+          </div>
+        </div>
+
+        <!-- Row 3 : Position Type + Job Function -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-position-type">Position Type</label>
+            <select id="cv-position-type" name="positionType">
+              <option value="">— Select —</option>
+              <option value="Full-Time">Full-Time</option>
+              <option value="Part-Time">Part-Time</option>
+              <option value="Contract">Contract</option>
+              <option value="Supply / Relief">Supply / Relief</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cv-job-function">Job Function</label>
+            <select id="cv-job-function" name="jobFunction">
+              <option value="">— Select —</option>
+              <option value="Teaching & Academic">Teaching & Academic</option>
+              <option value="School Leadership & Management">School Leadership & Management</option>
+              <option value="Finance & Accounting">Finance & Accounting</option>
+              <option value="IT & Systems">IT & Systems</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Facilities & Operations">Facilities & Operations</option>
+              <option value="Marketing & Admissions">Marketing & Admissions</option>
+              <option value="Other (Support Staff)">Other (Support Staff)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 4 : Subject / Specialisation + Experience -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-subject">Subject / Specialisation</label>
+            <select id="cv-subject" name="subject">
+              <option value="">— Select —</option>
+              <option>English</option>
+              <option>Mathematics</option>
+              <option>Science</option>
+              <option>Physics</option>
+              <option>Chemistry</option>
+              <option>Biology</option>
+              <option>History</option>
+              <option>Geography</option>
+              <option>ICT / Computing</option>
+              <option>Arts</option>
+              <option>Physical Education</option>
+              <option>Business Studies</option>
+              <option>Economics</option>
+              <option>Mandarin Chinese</option>
+              <option>Malay</option>
+              <option>Early Childhood</option>
+              <option>Special Education Needs</option>
+              <option>School Administration</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cv-experience">Years of Relevant Experience</label>
+            <select id="cv-experience" name="experience">
+              <option value="">— Select —</option>
+              <option value="<1">Less than 1 year</option>
+              <option value="1-2">1 – 2 years</option>
+              <option value="3-5">3 – 5 years</option>
+              <option value="5-10">5 – 10 years</option>
+              <option value="10+">More than 10 years</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 5 : Qualification + Salary -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cv-qualification">Highest Qualification</label>
+            <select id="cv-qualification" name="qualification">
+              <option value="">— Select —</option>
+              <option>Bachelor's Degree</option>
+              <option>Master's Degree</option>
+              <option>PhD</option>
+              <option>Teaching Certificate</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cv-salary">Expected Annual Salary (RM, Gross)</label>
+            <input type="text" id="cv-salary" name="expectedSalary" placeholder="e.g. 60000" />
+          </div>
+        </div>
+
+        <!-- Row 6 : Key Skills -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="cv-skills">Key Skills & Competencies</label>
+            <textarea id="cv-skills" name="skills" rows="3"
+              placeholder="Curriculum design, IB/AP experience, Assessment & feedback…"></textarea>
+          </div>
+        </div>
+
+        <!-- Row 7 : Languages -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Languages (Professional Level)</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="English" /> English</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Malay" /> Malay</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Mandarin" /> Mandarin</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Tamil" /> Tamil</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Other" /> Other</label>
             </div>
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cv-phone">Phone Number</label>
-              <input type="tel" id="cv-phone" name="phone" placeholder="+60 12 345 6789" />
-            </div>
-            <div class="form-group">
-              <label for="cv-targeted-roles">Targeted Role(s)</label>
-              <input type="text" id="cv-targeted-roles" name="targetedRoles" placeholder="e.g. Head of Science, Year 4 Teacher" />
+        <!-- Row 8 : Preferred Locations -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Preferred Location(s)</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kuala Lumpur" /> Kuala Lumpur</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Selangor" /> Selangor</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Penang" /> Penang</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Johor Bahru" /> Johor Bahru</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kota Kinabalu" /> Kota Kinabalu</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kuching" /> Kuching</label>
+              <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Other" /> Other</label>
             </div>
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cv-subject">Subject / Specialisation</label>
-              <select id="cv-subject" name="subject">
-                <option value="">— Select —</option>
-                <option>English</option>
-                <option>Mathematics</option>
-                <option>Science</option>
-                <option>Physics</option>
-                <option>Chemistry</option>
-                <option>Biology</option>
-                <option>History</option>
-                <option>Geography</option>
-                <option>ICT / Computing</option>
-                <option>Arts</option>
-                <option>Physical Education</option>
-                <option>Business Studies</option>
-                <option>Economics</option>
-                <option>Mandarin Chinese</option>
-                <option>Malay</option>
-                <option>Early Childhood</option>
-                <option>Special Education Needs</option>
-                <option>School Administration</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="cv-experience">Years of Relevant Experience</label>
-              <select id="cv-experience" name="experience">
-                <option value="">— Select —</option>
-                <option value="<1">Less than 1 year</option>
-                <option value="1-2">1 – 2 years</option>
-                <option value="3-5">3 – 5 years</option>
-                <option value="5-10">5 – 10 years</option>
-                <option value="10+">More than 10 years</option>
-              </select>
-            </div>
+        <!-- Row 9 : Other location (hidden by default) -->
+        <div class="form-row" id="otherCitiesRow" style="display:none;">
+          <div class="form-group full-width">
+            <label for="cv-other-location">Please specify</label>
+            <input type="text" id="cv-other-location" name="otherLocation" placeholder="City / Region" />
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="cv-qualification">Highest Qualification</label>
-              <select id="cv-qualification" name="qualification">
-                <option value="">— Select —</option>
-                <option>Bachelor's Degree</option>
-                <option>Master's Degree</option>
-                <option>PhD</option>
-                <option>Teaching Certificate</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="cv-salary">Expected Annual Salary (RM, Gross)</label>
-              <input type="text" id="cv-salary" name="expectedSalary" placeholder="e.g. 60000" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label for="cv-skills">Key Skills & Competencies</label>
-              <textarea id="cv-skills" name="skills" rows="3"
-                placeholder="Curriculum design, IB/AP experience, Assessment & feedback…"></textarea>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label>Languages (Professional Level)</label>
-              <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="English" /> English</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Malay" /> Malay</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Mandarin" /> Mandarin</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Tamil" /> Tamil</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-languages" value="Other" /> Other</label>
+        <!-- Row 10 : CV Upload -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Upload your CV <span class="required">*</span></label>
+            <div class="file-drop" id="cvFileDrop">
+              <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" required />
+              <div class="file-drop__ui" id="cvFileDropUI">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p>Drag & drop or <span class="file-drop__link">browse</span></p>
+                <p class="file-drop__hint">PDF, DOC or DOCX — max 5 MB</p>
+              </div>
+              <div class="file-drop__preview" id="cvFilePreview" style="display:none">
+                <span id="cvFileName"></span>
+                <button type="button" id="removeCvFile">✕</button>
               </div>
             </div>
+            <small class="form-error" id="err-cv-file"></small>
           </div>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label>Preferred Location(s)</label>
-              <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kuala Lumpur" /> Kuala Lumpur</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Selangor" /> Selangor</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Penang" /> Penang</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Johor Bahru" /> Johor Bahru</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kota Kinabalu" /> Kota Kinabalu</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Kuching" /> Kuching</label>
-                <label class="checkbox-label"><input type="checkbox" name="cv-locations" value="Other" /> Other</label>
-              </div>
-            </div>
+        <!-- Row 11 : Additional Notes -->
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label for="cv-notes">Additional Notes</label>
+            <textarea id="cv-notes" name="notes" rows="3"
+              placeholder="Availability, notice period, preferred working environment…"></textarea>
           </div>
+        </div>
 
-          <div class="form-row" id="otherCitiesRow" style="display:none;">
-            <div class="form-group full-width">
-              <label for="cv-other-location">Please specify</label>
-              <input type="text" id="cv-other-location" placeholder="City / Region" />
-            </div>
-          </div>
+        <!-- Submit -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn--solid btn--full" id="cvSubmitBtn">
+            <span id="cvBtnText">Send my profile</span>
+            <span id="cvBtnSpinner" class="btn-spinner" style="display:none"></span>
+          </button>
+        </div>
 
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label>Upload your CV <span class="required">*</span></label>
-              <div class="file-drop" id="cvFileDrop">
-                <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" required />
-                <div class="file-drop__ui" id="cvFileDropUI">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                  <p>Drag & drop or <span class="file-drop__link">browse</span></p>
-                  <p class="file-drop__hint">PDF, DOC or DOCX — max 5 MB</p>
-                </div>
-                <div class="file-drop__preview" id="cvFilePreview" style="display:none">
-                  <span id="cvFileName"></span>
-                  <button type="button" id="removeCvFile">✕</button>
-                </div>
-              </div>
-              <small class="form-error" id="err-cv-file"></small>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label for="cv-notes">Additional Notes</label>
-              <textarea id="cv-notes" name="notes" rows="3"
-                placeholder="Availability, notice period, preferred working environment…"></textarea>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn--solid btn--full" id="cvSubmitBtn">
-              <span id="cvBtnText">Send my profile</span>
-              <span id="cvBtnSpinner" class="btn-spinner" style="display:none"></span>
-            </button>
-          </div>
-
-        </form>
-      </div>
-
-      <!-- Success state -->
-      <div id="cvSuccessState" style="display:none" class="modal__success">
-        <div class="success-icon">✓</div>
-        <h3>Profile received!</h3>
-        <p>Thank you — I will review your CV and be in touch within 24 hours.</p>
-        <button class="btn btn--outline" id="cvSuccessClose">Close</button>
-      </div>
-
-      <!-- Error state -->
-      <div id="cvErrorState" style="display:none" class="modal__error">
-        <div class="error-icon">!</div>
-        <h3>Something went wrong</h3>
-        <p>Please try again or contact me directly on LinkedIn.</p>
-        <button class="btn btn--outline" id="cvRetryBtn">Try again</button>
-      </div>
-
+      </form>
     </div>
-  </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+    <!-- Success state -->
+    <div id="cvSuccessState" style="display:none" class="modal__success">
+      <div class="success-icon">✓</div>
+      <h3>Profile received!</h3>
+      <p>Thank you — I will review your CV and be in touch within 24 hours.</p>
+      <button class="btn btn--outline" id="cvSuccessClose">Close</button>
+    </div>
+
+    <!-- Error state -->
+    <div id="cvErrorState" style="display:none" class="modal__error">
+      <div class="error-icon">!</div>
+      <h3>Something went wrong</h3>
+      <p>Please try again or contact me directly on LinkedIn.</p>
+      <button class="btn btn--outline" id="cvRetryBtn">Try again</button>
+    </div>
+
+  </div>
+</div>
+
 </html>
