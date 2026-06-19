@@ -416,36 +416,40 @@ function applyFilters() {
       cvSubmitBtn.disabled        = true;
 
       const formData = new FormData();
-      formData.append('fullName',     document.getElementById('cv-name')?.value.trim());
-      formData.append('email',        document.getElementById('cv-email')?.value.trim());
-      formData.append('phone',        document.getElementById('cv-phone')?.value.trim());
-      formData.append('targetedRoles',document.getElementById('cv-targeted-roles')?.value.trim());
-      formData.append('subject',      document.getElementById('cv-subject')?.value);
-      formData.append('experience',   document.getElementById('cv-experience')?.value);
-      formData.append('qualification',document.getElementById('cv-qualification')?.value);
-      formData.append('skills',        document.getElementById('cv-skills')?.value.trim());
-      formData.append('languages',     Array.from(document.querySelectorAll('input[name="cv-languages"]:checked')).map(c => c.value).join(', '));
-      formData.append('expectedSalary',document.getElementById('cv-salary')?.value.trim());
-      formData.append('locations',     Array.from(document.querySelectorAll('input[name="cv-locations"]:checked')).map(c => c.value).join(', '));
-      formData.append('notes',        document.getElementById('cv-notes')?.value.trim());
-      formData.append('cv',           cvFileInput?.files[0]);
+formData.append('fullName',      document.getElementById('cv-name')?.value.trim());
+formData.append('email',         document.getElementById('cv-email')?.value.trim());
+formData.append('phone',         document.getElementById('cv-phone')?.value.trim());
+formData.append('positionType',  document.getElementById('cv-position-type')?.value);
+formData.append('jobFunction',   document.getElementById('cv-job-function')?.value);
+formData.append('targetedRoles', document.getElementById('cv-targeted-roles')?.value.trim());
+formData.append('subject',       document.getElementById('cv-subject')?.value);
+formData.append('experience',    document.getElementById('cv-experience')?.value);
+formData.append('qualification', document.getElementById('cv-qualification')?.value);
+formData.append('skills',        document.getElementById('cv-skills')?.value.trim());
+formData.append('languages',     Array.from(document.querySelectorAll('input[name="cv-languages"]:checked')).map(c => c.value).join(', '));
+formData.append('expectedSalary',document.getElementById('cv-salary')?.value.trim());
+formData.append('locations',     Array.from(document.querySelectorAll('input[name="cv-locations"]:checked')).map(c => c.value).join(', '));
+formData.append('otherLocation', document.getElementById('cv-other-location')?.value.trim());
+formData.append('notes',         document.getElementById('cv-notes')?.value.trim());
+if (cvFileInput?.files[0]) {
+  formData.append('cv', cvFileInput.files[0]);
+}
 
-      try {
-        const res = await fetch(CV_WEBHOOK, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('Webhook error');
-        cvFormState.style.display   = 'none';
-        cvSuccessState.style.display = 'flex';
-      } catch (err) {
-        console.error(err);
-        cvFormState.style.display  = 'none';
-        cvErrorState.style.display = 'flex';
-      } finally {
-        cvBtnText.style.display   = 'inline';
-        cvBtnSpinner.style.display = 'none';
-        cvSubmitBtn.disabled       = false;
-      }
-    });
-  }
+try {
+  const res = await fetch(CV_WEBHOOK, { method: 'POST', body: formData });
+  if (!res.ok) throw new Error('Webhook error');
+  cvFormState.style.display    = 'none';
+  cvSuccessState.style.display = 'flex';
+} catch (err) {
+  console.error(err);
+  cvFormState.style.display  = 'none';
+  cvErrorState.style.display = 'flex';
+} finally {
+  cvBtnText.style.display    = 'inline';
+  cvBtnSpinner.style.display = 'none';
+  cvSubmitBtn.disabled       = false;
+}
+
 
   document.getElementById('cvRetryBtn')?.addEventListener('click', () => {
     cvErrorState.style.display  = 'none';
