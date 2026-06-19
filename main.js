@@ -142,7 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
 // RENDER JOB CARDS
 // ============================================================
-function renderCards(jobs) {
+function escapeHtml(str) {
+  return (str || '')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"');
+}
+  function formatJobText(text) {
+  if (!text) return '<p>—</p>';
+  if (/<[a-z][\s\S]*>/i.test(text)) return text;
+
+  const lines = text.split('\n').filter(l => l.trim());
+  const isList = lines.length > 1 && lines.every(l => /^[-•*]/.test(l.trim()));
+
+  if (isList) {
+    const items = lines.map(l =>
+      `<li>${escapeHtml(l.replace(/^[-•*]\s*/, '').trim())}</li>`
+    ).join('');
+    return `<ul>${items}</ul>`;
+  }
+
+  return lines.map(l => `<p>${escapeHtml(l.trim())}</p>`).join('');
+}
+
+  function renderCards(jobs) {
   const grid = document.getElementById('jobsGrid');
   if (!grid) return;
   grid.innerHTML = '';
@@ -153,7 +177,7 @@ function renderCards(jobs) {
     card.dataset.idx = idx;
 
     const type     = job['Contract type']       || '';
-    const title    = job['Job Title']           || 'Untitled';
+    const title    = job['Job title']           || 'Untitled';
     const school   = job['Establishment']       || '';
     const city     = job['City']               || '';
     const district = job['Discrict']           || '';   // note: typo conservé du sheet
@@ -183,35 +207,38 @@ function renderCards(jobs) {
 // OPEN JOB MODAL
 // ============================================================
 function openJobModal(job) {
-  const type     = job['Contract type']       || '';
-  const title    = job['Job Title']           || 'Position';
-  const city     = job['City']               || '';
-  const district = job['Discrict']           || '';
-  const salary   = job['Annual base salary'] || '';
-  const school   = job['Establishment']       || '';
+  const type      = job['Contract type']       || '';
+  const title     = job['Job title']           || 'Position';
+  const city      = job['City']               || '';
+  const district  = job['Discrict']           || '';
+  const salary    = job['Annual base salary'] || '';
+  const school    = job['Establishment']       || '';
+  const longDesc  = job['Long description']   || '';
+  const requirements = job['Requirements']    || '';
 
-  document.getElementById('jd-type').textContent       = type;
-  document.getElementById('jobModalTitle').textContent  = title;
+  document.getElementById('jd-type').textContent      = type;
+  document.getElementById('jobModalTitle').textContent = title;
 
   document.querySelector('#jd-location span').textContent = city + (district ? ` · ${district}` : '');
   document.querySelector('#jd-salary span').textContent   = salary;
-  document.querySelector('#jd-date span').textContent     = '';   // plus de date dans DB_jobs
+  document.querySelector('#jd-date span').textContent     = '';
 
   const schoolEl   = document.getElementById('jd-school');
   const districtEl = document.getElementById('jd-district');
   if (schoolEl)   schoolEl.textContent   = school;
   if (districtEl) districtEl.textContent = district;
 
-  document.getElementById('jd-description').innerHTML  = formatJobText(job['Long description']  || '');
-  document.getElementById('jd-requirements').innerHTML = formatJobText(job['Requirements'] || '');
+  document.getElementById('jd-description').innerHTML  = formatJobText(longDesc);
+  document.getElementById('jd-requirements').innerHTML = formatJobText(requirements);
 
   jobModal.dataset.jobTitle    = title;
-  jobModal.dataset.jobId       = job['Job Title'] || '';
+  jobModal.dataset.jobId       = title;
   jobModal.dataset.jobSchool   = school;
   jobModal.dataset.jobLocation = city;
 
   openModal(jobModal);
 }
+
 
 // ============================================================
 // APPLY FILTERS — mettre à jour aussi le filtre par type
@@ -221,7 +248,7 @@ function applyFilters() {
   const type   = (document.getElementById('filterType')?.value  || '').toLowerCase();
 
   const filtered = allJobs.filter(job => {
-    const jobTitle = (job['Job Title']     || '').toLowerCase();
+    const jobTitle = (job['Job title']     || '').toLowerCase();
     const jobSchool = (job['Establishment'] || '').toLowerCase();
     const jobCity   = (job['City']         || '').toLowerCase();
     const jobType = (job['Contract type'] || '').toLowerCase();
@@ -270,12 +297,12 @@ const raw = await res.text();
 
     const headers = rows[0].map(h => h.trim());
     allJobs = rows.slice(1)
-      .map(row => {
-        const job = {};
-        headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
-        return job;
-      })
-      .filter(job => (job['Job Title'] || '').trim());
+  .map(row => {
+    const job = {};
+    headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
+    return job;
+  })
+  .filter(job => (job['Job title'] || '').trim()); // ← minuscule 't'
 
     console.log('[DEBUG] allJobs after filter:', allJobs.length, allJobs);
 
