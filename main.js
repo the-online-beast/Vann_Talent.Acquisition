@@ -419,7 +419,6 @@ function applyFilters() {
 formData.append('fullName',      document.getElementById('cv-name')?.value.trim());
 formData.append('email',         document.getElementById('cv-email')?.value.trim());
 formData.append('phone',         document.getElementById('cv-phone')?.value.trim());
-formData.append('positionType',  document.getElementById('cv-position-type')?.value);
 formData.append('jobFunction',   document.getElementById('cv-job-function')?.value);
 formData.append('targetedRoles', document.getElementById('cv-targeted-roles')?.value.trim());
 formData.append('subject',       document.getElementById('cv-subject')?.value);
