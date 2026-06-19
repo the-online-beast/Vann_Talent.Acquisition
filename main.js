@@ -140,132 +140,111 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================================
-  // VACANCIES — Render job cards
-  // ============================================================
-  function renderCards(jobs) {
-    const grid = document.getElementById('jobsGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
+// RENDER JOB CARDS
+// ============================================================
+function renderCards(jobs) {
+  const grid = document.getElementById('jobsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
 
-    jobs.forEach(job => {
-      const card = document.createElement('div');
-      card.className = 'job-card';
-      card.setAttribute('role', 'button');
-      card.setAttribute('tabindex', '0');
-      card.setAttribute('aria-label', `View details for ${job.Title}`);
+  jobs.forEach((job, idx) => {
+    const card = document.createElement('article');
+    card.className = 'job-card';
+    card.dataset.idx = idx;
 
-      const type = job['Job Type'] || job.Type || '';
-      const school = job.School || '';
-      const city = job.City || '';
-      const salary = job['Annual base salary'] || job.Salary || '';
-      const shortDesc = job['Short Description'] || '';
+    const type     = job['Contract type']       || '';
+    const title    = job['Job Title']           || 'Untitled';
+    const school   = job['Establishment']       || '';
+    const city     = job['City']               || '';
+    const district = job['Discrict']           || '';   // note: typo conservé du sheet
+    const salary   = job['Annual base salary'] || '';
+    const shortDesc = job['Short description'] || '';
 
-      card.innerHTML = `
-        <div class="job-card__top">
-          <div class="job-card__tags">
-            ${type ? `<span class="job-tag">${type}</span>` : ''}
-          </div>
-        </div>
-        <h3 class="job-card__title">${job.Title || 'Position'}</h3>
-        <p class="job-card__school">${school}</p>
-        <ul class="job-card__details">
-          ${city   ? `<li>📍 ${city}` : ''}
-          ${salary ? `<li>💰 ${salary}` : ''}
-        </ul>
-        <p class="job-card__short-desc">${shortDesc}</p>
-        <div class="job-card__footer">
-          <span class="job-card__cta">View details →</span>
-        </div>
-      `;
+    card.innerHTML = `
+      <div class="job-card__header">
+        <span class="job-card__type">${escapeHtml(type)}</span>
+      </div>
+      <h3 class="job-card__title">${escapeHtml(title)}</h3>
+      <p class="job-card__school">${escapeHtml(school)}</p>
+      <p class="job-card__meta">
+        <span class="job-card__location">${escapeHtml(city)}${district ? ' · ' + district : ''}</span>
+        ${salary ? `<span class="job-card__salary">${escapeHtml(salary)}</span>` : ''}
+      </p>
+      <p class="job-card__excerpt">${escapeHtml(shortDesc)}</p>
+      <span class="job-card__cta">View details →</span>
+    `;
 
-      const openDetail = () => openJobModal(job);
-      card.addEventListener('click', openDetail);
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(); }
-      });
+    card.addEventListener('click', () => openJobModal(job));
+    grid.appendChild(card);
+  });
+}
 
-      grid.appendChild(card);
-    });
+// ============================================================
+// OPEN JOB MODAL
+// ============================================================
+function openJobModal(job) {
+  const type     = job['Contract type']       || '';
+  const title    = job['Job Title']           || 'Position';
+  const city     = job['City']               || '';
+  const district = job['Discrict']           || '';
+  const salary   = job['Annual base salary'] || '';
+  const school   = job['Establishment']       || '';
+
+  document.getElementById('jd-type').textContent       = type;
+  document.getElementById('jobModalTitle').textContent  = title;
+
+  document.querySelector('#jd-location span').textContent = city + (district ? ` · ${district}` : '');
+  document.querySelector('#jd-salary span').textContent   = salary;
+  document.querySelector('#jd-date span').textContent     = '';   // plus de date dans DB_jobs
+
+  const schoolEl   = document.getElementById('jd-school');
+  const districtEl = document.getElementById('jd-district');
+  if (schoolEl)   schoolEl.textContent   = school;
+  if (districtEl) districtEl.textContent = district;
+
+  document.getElementById('jd-description').innerHTML  = formatJobText(job['Long description']  || '');
+  document.getElementById('jd-requirements').innerHTML = formatJobText(job['Requirements'] || '');
+
+  jobModal.dataset.jobTitle    = title;
+  jobModal.dataset.jobId       = job['Job Title'] || '';
+  jobModal.dataset.jobSchool   = school;
+  jobModal.dataset.jobLocation = city;
+
+  openModal(jobModal);
+}
+
+// ============================================================
+// APPLY FILTERS — mettre à jour aussi le filtre par type
+// ============================================================
+function applyFilters() {
+  const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
+  const type   = (document.getElementById('filterType')?.value  || '').toLowerCase();
+
+  const filtered = allJobs.filter(job => {
+    const jobTitle = (job['Job Title']     || '').toLowerCase();
+    const jobSchool = (job['Establishment'] || '').toLowerCase();
+    const jobCity   = (job['City']         || '').toLowerCase();
+    const jobType   = (job['Contract type']|| '').toLowerCase();
+
+    const matchSearch = !search ||
+      jobTitle.includes(search) ||
+      jobSchool.includes(search) ||
+      jobCity.includes(search);
+
+    const matchType = !type || jobType === type;
+
+    return matchSearch && matchType;
+  });
+
+  renderCards(filtered);
+
+  const counter = document.getElementById('vacanciesCount');
+  if (counter) {
+    counter.textContent = `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`;
+    counter.className   = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
   }
+}
 
-    // ============================================================
-  // VACANCIES — Job detail modal
-  // ============================================================
-  const jobModal = document.getElementById('jobModal');
-
-  function openJobModal(job) {
-    document.getElementById('jd-type').textContent       = job['Job Type'] || job.Type || '';
-    document.getElementById('jobModalTitle').textContent = job.Title || 'Position';
-
-    document.querySelector('#jd-location span').textContent = job.Location || '';
-    document.querySelector('#jd-salary span').textContent   = job.Salary   || '';
-    document.querySelector('#jd-date span').textContent     = job.Start    || job.Date_posted || '';
-
-    const schoolEl   = document.getElementById('jd-school');
-    const districtEl = document.getElementById('jd-district');
-    if (schoolEl)   schoolEl.textContent   = job.School   || '';
-    if (districtEl) districtEl.textContent = job.District || '';
-
-    document.getElementById('jd-description').innerHTML  = formatJobText(job.Description  || '');
-    document.getElementById('jd-requirements').innerHTML = formatJobText(job.Requirements || '');
-
-    jobModal.dataset.jobTitle    = job.Title    || '';
-    jobModal.dataset.jobId       = job.id       || job.ID || '';
-    jobModal.dataset.jobSchool   = job.School   || '';
-    jobModal.dataset.jobLocation = job.Location || '';
-
-    openModal(jobModal);
-  }
-
-
-  function formatJobText(text) {
-    if (!text) return '<p>—</p>';
-    if (/<[a-z][\s\S]*>/i.test(text)) return text;
-    const lines = text.split('\n').filter(l => l.trim());
-    const isList = lines.length > 0 && lines.every(l => /^[-•*]/.test(l.trim()));
-    if (isList) {
-      const items = lines.map(l => `<li>${l.replace(/^[-•*]\s*/, '').trim()}</li>`).join('');
-      return `<ul>${items}</ul>`;
-    }
-    return lines.map(l => `<p>${l.trim()}</p>`).join('');
-  }
-
-  document.getElementById('closeJobModal')?.addEventListener('click', () => closeModal(jobModal));
-
-  // ============================================================
-  // VACANCIES — Filters
-  // ============================================================
-  let allJobs = [];
-
-  function applyFilters() {
-    const search = (document.getElementById('filterSearch')?.value || '').toLowerCase();
-    const type   = (document.getElementById('filterType')?.value || '').toLowerCase();
-
-    const filtered = allJobs.filter(job => {
-      const matchSearch =
-        !search ||
-        (job.Title    || '').toLowerCase().includes(search) ||
-        (job.School   || '').toLowerCase().includes(search) ||
-        (job.City     || '').toLowerCase().includes(search) ||
-        (job.District || '').toLowerCase().includes(search);
-
-      const jobType = (job['Job Type'] || job.Type || '').toLowerCase();
-      const matchType = !type || jobType === type;
-
-      return matchSearch && matchType;
-    });
-
-    renderCards(filtered);
-
-    const counter = document.getElementById('vacanciesCount');
-    if (counter) {
-      counter.textContent = `${filtered.length} open position${filtered.length !== 1 ? 's' : ''}`;
-      counter.className  = `vacancies__count ${filtered.length > 0 ? 'is-green' : 'is-red'}`;
-    }
-  }
-
-  document.getElementById('filterSearch')?.addEventListener('input', applyFilters);
-  document.getElementById('filterType')?.addEventListener('change', applyFilters);
 
   // ============================================================
   // VACANCIES — Load from Google Sheet (CSV)
