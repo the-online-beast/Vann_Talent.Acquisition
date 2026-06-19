@@ -247,58 +247,68 @@ function applyFilters() {
 
 
   // ============================================================
-  // VACANCIES — Load from Google Sheet (CSV)
-  // ============================================================
-  async function loadJobs() {
-    showState('loading');
-    try {
-      const res = await fetch(SHEET_VACANCIES_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const raw = await res.text();
+// VACANCIES — Load from Google Sheet (CSV)
+// ============================================================
+async function loadJobs() {
+  showState('loading');
+  try {
+    const res = await fetch(SHEET_VACANCIES_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.text();
 
-      const rows = parseCSV(raw);
-      if (rows.length < 2) { showState('empty'); return; }
+    // DEBUG — voir ce qu'on reçoit
+    console.log('[DEBUG] raw CSV (first 500 chars):', raw.substring(0, 500));
+    console.log('[DEBUG] raw length:', raw.length);
 
-      const headers = rows[0].map(h => h.trim());
-      allJobs = rows.slice(1)
-        .map(row => {
-          const job = {};
-          headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
-          return job;
-        })
-        .filter(job => (job['Job Title'] || job.Title || '').trim());
+    const rows = parseCSV(raw);
+    console.log('[DEBUG] rows parsed:', rows.length);
+    console.log('[DEBUG] headers:', rows[0]);
+    console.log('[DEBUG] first data row:', rows[1]);
 
+    if (rows.length < 2) { showState('empty'); return; }
 
-      if (allJobs.length === 0) {
-        showState('empty');
-      } else {
-        showState('results', allJobs.length);
-        renderCards(allJobs);
+    const headers = rows[0].map(h => h.trim());
+    allJobs = rows.slice(1)
+      .map(row => {
+        const job = {};
+        headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
+        return job;
+      })
+      .filter(job => (job['Job Title'] || '').trim());
 
-        // Populate type filter dynamically
-        const typeSelect = document.getElementById('filterType');
-        if (typeSelect) {
-          const types = [...new Set(allJobs.map(j => j['Contract type']).filter(Boolean))].sort();
-          const firstOpt = typeSelect.querySelector('option[value=""]');
-          typeSelect.innerHTML = '';
-          if (firstOpt) typeSelect.appendChild(firstOpt);
-          else typeSelect.insertAdjacentHTML('afterbegin', '<option value="">All types</option>');
-          types.forEach(t => {
-            const opt = document.createElement('option');
-            opt.value = t;
-            opt.textContent = t;
-            typeSelect.appendChild(opt);
-          });
-        }
+    console.log('[DEBUG] allJobs after filter:', allJobs.length, allJobs);
+
+    if (allJobs.length === 0) {
+      showState('empty');
+    } else {
+      showState('results', allJobs.length);
+      renderCards(allJobs);
+
+      // Populate type filter dynamically
+      const typeSelect = document.getElementById('filterType');
+      if (typeSelect) {
+        const types = [...new Set(allJobs.map(j => j['Contract type']).filter(Boolean))].sort();
+        const firstOpt = typeSelect.querySelector('option[value=""]');
+        typeSelect.innerHTML = '';
+        if (firstOpt) typeSelect.appendChild(firstOpt);
+        else typeSelect.insertAdjacentHTML('afterbegin', '<option value="">All types</option>');
+        types.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          typeSelect.appendChild(opt);
+        });
       }
-    } catch (err) {
-      console.error('[VS Recruitment] Failed to load jobs:', err);
-      showState('error');
     }
+  } catch (err) {
+    console.error('[VS Recruitment] Failed to load jobs:', err);
+    showState('error');
   }
+}
 
-  document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
-  loadJobs();
+document.getElementById('retryBtn')?.addEventListener('click', loadJobs);
+loadJobs();
+
 
   // ============================================================
   // CV MODAL — Passive candidates form
