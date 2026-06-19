@@ -252,7 +252,10 @@ function applyFilters() {
 async function loadJobs() {
   showState('loading');
   try {
-    const res = await fetch(SHEET_VACANCIES_URL, { cache: 'no-store' });
+    const res = await fetch(SHEET_VACANCIES_URL, {
+  cache: 'no-store',
+  mode: 'cors'
+});
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.text();
 
