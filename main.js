@@ -224,7 +224,7 @@ function applyFilters() {
     const jobTitle = (job['Job Title']     || '').toLowerCase();
     const jobSchool = (job['Establishment'] || '').toLowerCase();
     const jobCity   = (job['City']         || '').toLowerCase();
-    const jobType   = (job['Contract type']|| '').toLowerCase();
+    const jobType = (job['Contract type'] || '').toLowerCase();
 
     const matchSearch = !search ||
       jobTitle.includes(search) ||
@@ -266,7 +266,8 @@ function applyFilters() {
           headers.forEach((h, i) => { job[h] = (row[i] || '').trim(); });
           return job;
         })
-        .filter(job => job.Title && job.Title.trim());
+        .filter(job => (job['Job Title'] || job.Title || '').trim());
+
 
       if (allJobs.length === 0) {
         showState('empty');
@@ -277,7 +278,7 @@ function applyFilters() {
         // Populate type filter dynamically
         const typeSelect = document.getElementById('filterType');
         if (typeSelect) {
-          const types = [...new Set(allJobs.map(j => j['Job Type'] || j.Type).filter(Boolean))].sort();
+          const types = [...new Set(allJobs.map(j => j['Contract type']).filter(Boolean))].sort();
           const firstOpt = typeSelect.querySelector('option[value=""]');
           typeSelect.innerHTML = '';
           if (firstOpt) typeSelect.appendChild(firstOpt);
