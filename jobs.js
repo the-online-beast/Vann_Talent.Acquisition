@@ -20,10 +20,10 @@
 //      Leave empty ('') if not configured yet.
 // ============================================================
 
-const SHEET_VACANCIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRUhMgmCGpq1KM4-_Aig--5Vc1qdBctYkS3huaY_yw3hcs3q5oEJ7gKXsx1aIPCFtR13d7AguEdKeHN/pub?output=csv';
+const SHEET_VACANCIES_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRkoXsy6784kZL208ovB7oJojrLH2hwXuEysJ9ldNB019THeB6oGHTgNHE5gVUXv5SLVYfH-KPr24o/pub?output=csv';
 
-const SHEET_CANDIDATES_URL = 'https://docs.google.com/spreadsheets/d/1ZPuAG5ymp1SD_GcKRias41eynwzdfS6MNdGV6BrNSHI/edit?gid=0#gid=0';
+const SHEET_CANDIDATES_URL = 'https://docs.google.com/spreadsheets/d/1EdzEcgwHDERfaIEVMmEn9XOPTkKDZA_gE01iAoLUsBE/edit?gid=0#gid=0';
 
 const CV_WEBHOOK    = 'https://n8n.strength-os.tech/webhook/cv-submit';
 const APPLY_WEBHOOK = 'https://n8n.strength-os.tech/webhook/apply';
-const DRIVE_FOLDER  = 'https://drive.google.com/drive/folders/15qYwk0SJC-K3pWNdoOV-bR7f7qNjacza';
+const DRIVE_FOLDER  = 'https://drive.google.com/drive/folders/1Kbw5R-BmeCH9QvbeewyZYnrcpjKU5C0b';
