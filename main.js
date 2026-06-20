@@ -51,6 +51,58 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === overlay) closeModal(overlay);
     });
   });
+// ============================================================
+// CSV PARSER
+// ============================================================
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+
+  // Parse une ligne CSV en tenant compte des guillemets
+  function parseLine(line) {
+    const cols = [];
+    let cur = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+
+      if (ch === '"') {
+        // Guillemet double à l'intérieur d'un champ entre guillemets → escape
+        if (inQuotes && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === ',' && !inQuotes) {
+        cols.push(cur.trim());
+        cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    cols.push(cur.trim());
+    return cols;
+  }
+
+  const headers = parseLine(lines[0]);
+  const jobs = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const values = parseLine(line);
+    const obj = {};
+    headers.forEach((h, idx) => {
+      obj[h.trim()] = values[idx] !== undefined ? values[idx] : '';
+    });
+    jobs.push(obj);
+  }
+
+  return jobs;
+}
 
   // ============================================================
   // LOAD JOBS
