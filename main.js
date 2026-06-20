@@ -126,9 +126,9 @@ function parseCSV(text) {
 
     const text = await res.text(); // ← CSV texte brut, pas JSON
     const data = parseCSV(text);   // ← on parse nous-mêmes
-    allJobs = data;
-    populateTypeFilter(data);
-    renderCards(data);
+    const visibleJobs = allJobs.filter(j => j['Status'] !== 'Hidden');
+    populateTypeFilter(visibleJobs);
+    renderCards(visibleJobs);
   } catch (e) {
     loading.style.display = 'none';
     error.style.display   = 'block';
