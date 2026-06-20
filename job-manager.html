@@ -436,7 +436,7 @@
     </div>
 
     <div class="success-msg" id="create-success">
-      <span>✅</span> Offer successfully created!
+      <span>✅</span> <span id="success-text"></span>
     </div>
     <div class="error-msg" id="create-error">
       <span>❌</span> <span id="error-text"></span>
@@ -523,7 +523,7 @@
               </li>
             </ul>
             <div class="bullet-controls">
-              <button type="button" class="btn-add-bullet" data-target="requirements-list">+ Add requirement</button>
+              <button type="button" class="btn-add-bullet" id="add-requirement-btn">+ Add requirement</button>
             </div>
           </div>
         </div>
@@ -594,25 +594,29 @@
   const WEBHOOK_URL = 'https://n8n.strength-os.tech/webhook/job-managment';
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRkoXsy6784kZL208ovB7oJojrLH2hwXuEysJ9ldNB019THeB6oGHTgNHE5gVUXv5SLVYfH-KPr24o/pub?output=csv';
 
+  let allJobs = []; // Store jobs for toggle/delete
+
   /* ═══════════════════════════════════════════
      TAB SWITCHING
      ═══════════════════════════════════════════ */
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
-      const tabName = btn.dataset.tab;
+      const tabName = this.dataset.tab;
 
       // Deactivate all tabs
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
       // Activate clicked tab
-      btn.classList.add('active');
+      this.classList.add('active');
       document.getElementById(tabName).classList.add('active');
 
       // If manage tab, load jobs
       if (tabName === 'manage') {
-        loadJobs();
+        setTimeout(() => {
+          loadJobs();
+        }, 100);
       }
     });
   });
@@ -630,8 +634,10 @@
       <button type="button" class="bullet-remove" title="Remove">✕</button>
     `;
 
-    li.querySelector('.bullet-remove').addEventListener('click', (e) => {
+    const removeBtn = li.querySelector('.bullet-remove');
+    removeBtn.addEventListener('click', function(e) {
       e.preventDefault();
+      e.stopPropagation();
       li.remove();
     });
 
@@ -648,17 +654,19 @@
     return texts.join(' • ');
   }
 
-  document.querySelectorAll('.btn-add-bullet').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      addBulletItem(btn.dataset.target);
-    });
+  // Bind Add Requirement button
+  document.getElementById('add-requirement-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    addBulletItem('requirements-list');
   });
 
-  document.querySelectorAll('.bullet-remove').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Bind initial remove buttons
+  document.querySelectorAll('#requirements-list .bullet-remove').forEach(btn => {
+    btn.addEventListener('click', function(e) {
       e.preventDefault();
-      btn.closest('.bullet-item').remove();
+      e.stopPropagation();
+      this.closest('.bullet-item').remove();
     });
   });
 
@@ -687,7 +695,7 @@
     }
 
     if (emptyFields.length > 0) {
-      showError(`Please fill in all required fields`);
+      showError('Please fill in all required fields');
       return false;
     }
 
@@ -699,8 +707,10 @@
      ═══════════════════════════════════════════ */
   function showSuccess(msg = 'Offer successfully created!') {
     const el = document.getElementById('create-success');
-    el.innerHTML = '<span>✅</span> ' + msg;
+    const textEl = document.getElementById('success-text');
+    textEl.textContent = msg;
     el.classList.add('visible');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => el.classList.remove('visible'), 3500);
   }
 
@@ -709,17 +719,14 @@
     const textEl = document.getElementById('error-text');
     textEl.textContent = msg;
     el.classList.add('visible');
-    
-    // Scroll to error message
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
     setTimeout(() => el.classList.remove('visible'), 4000);
   }
 
   /* ═══════════════════════════════════════════
      SUBMIT FORM
      ═══════════════════════════════════════════ */
-  document.getElementById('job-form').addEventListener('submit', async (e) => {
+  document.getElementById('job-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -743,6 +750,8 @@
       'Status': 'active'
     };
 
+    console.log('Sending payload:', payload);
+
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
@@ -750,12 +759,17 @@
         body: JSON.stringify(payload)
       });
 
+      console.log('Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Server error ${response.status}`);
       }
 
       // Reset form
       document.getElementById('job-form').reset();
+      
       // Reset requirements
       document.getElementById('requirements-list').innerHTML = `
         <li class="bullet-item">
@@ -766,14 +780,16 @@
       `;
 
       // Rebind remove button
-      document.querySelector('#requirements-list .bullet-remove').addEventListener('click', (e) => {
+      document.querySelector('#requirements-list .bullet-remove').addEventListener('click', function(e) {
         e.preventDefault();
-        e.target.closest('.bullet-item').remove();
+        e.stopPropagation();
+        this.closest('.bullet-item').remove();
       });
 
       showSuccess('Offer successfully created and synced with Google Sheets!');
     } catch (error) {
-      showError(`Error sending: ${error.message}`);
+      console.error('Fetch error:', error);
+      showError(`Error: ${error.message}`);
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit Offer';
@@ -795,8 +811,17 @@
 
     try {
       const response = await fetch(CSV_URL);
+      console.log('CSV Fetch response:', response.status);
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const csvText = await response.text();
+      console.log('CSV length:', csvText.length);
+      
       const jobs = parseCSV(csvText);
+      console.log('Parsed jobs:', jobs.length, jobs);
+      
+      allJobs = jobs; // Store for later
 
       if (jobs.length === 0) {
         loading.style.display = 'none';
@@ -825,7 +850,7 @@
           </td>
           <td>
             <div class="action-buttons">
-              <button class="btn-small btn-toggle ${status === 'inactive' ? 'inactive' : ''}` data-idx="${idx}" data-status="${status}">
+              <button class="btn-small btn-toggle ${status === 'inactive' ? 'inactive' : ''}" data-idx="${idx}" data-status="${status}">
                 ${status === 'active' ? 'Hide' : 'Show'}
               </button>
               <button class="btn-small btn-delete" data-idx="${idx}">Delete</button>
@@ -838,21 +863,21 @@
 
       // Bind toggle buttons
       tbody.querySelectorAll('.btn-toggle').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', function(e) {
           e.preventDefault();
-          const idx = parseInt(btn.dataset.idx);
-          const currentStatus = btn.dataset.status;
+          const idx = parseInt(this.dataset.idx);
+          const currentStatus = this.dataset.status;
           const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-          toggleJobStatus(jobs[idx], newStatus);
+          toggleJobStatus(allJobs[idx], newStatus);
         });
       });
 
       // Bind delete buttons
       tbody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', function(e) {
           e.preventDefault();
-          const idx = parseInt(btn.dataset.idx);
-          deleteJob(jobs[idx]);
+          const idx = parseInt(this.dataset.idx);
+          deleteJob(allJobs[idx]);
         });
       });
 
@@ -923,6 +948,8 @@
   async function toggleJobStatus(job, newStatus) {
     const payload = { ...job, Status: newStatus };
 
+    console.log('Toggling job:', payload);
+
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
@@ -930,11 +957,16 @@
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error(`Error ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Toggle error:', errorText);
+        throw new Error(`Error ${response.status}`);
+      }
 
       showSuccess(`Status changed to ${newStatus === 'active' ? 'Active' : 'Inactive'}`);
       loadJobs();
     } catch (error) {
+      console.error('Toggle fetch error:', error);
       showError(`Error: ${error.message}`);
     }
   }
@@ -947,6 +979,8 @@
 
     const payload = { ...job, Status: 'deleted' };
 
+    console.log('Deleting job:', payload);
+
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
@@ -954,11 +988,16 @@
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error(`Error ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Delete error:', errorText);
+        throw new Error(`Error ${response.status}`);
+      }
 
       showSuccess('Offer deleted');
       loadJobs();
     } catch (error) {
+      console.error('Delete fetch error:', error);
       showError(`Delete error: ${error.message}`);
     }
   }
