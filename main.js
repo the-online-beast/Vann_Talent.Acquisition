@@ -58,28 +58,31 @@ document.addEventListener('DOMContentLoaded', () => {
   let allJobs = [];
 
   async function loadJobs() {
-    const grid    = document.getElementById('jobsGrid');
-    const loading = document.getElementById('jobsLoading');
-    const error   = document.getElementById('jobsError');
-    const empty   = document.getElementById('jobsEmpty');
+  const grid    = document.getElementById('jobsGrid');
+  const loading = document.getElementById('jobsLoading');
+  const error   = document.getElementById('jobsError');
+  const empty   = document.getElementById('jobsEmpty');
 
-    loading.style.display = 'block';
-    error.style.display   = 'none';
-    empty.style.display   = 'none';
-    grid.innerHTML        = '';
+  loading.style.display = 'block';
+  error.style.display   = 'none';
+  empty.style.display   = 'none';
+  grid.innerHTML        = '';
 
-    try {
-      const res  = await fetch(SHEET_URL);
-      if (!res.ok) throw new Error('Network error');
-      const data = await res.json();
-      allJobs = data;
-      populateTypeFilter(data);
-      renderCards(data);
-    } catch (e) {
-      loading.style.display = 'none';
-      error.style.display   = 'block';
-    }
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('Network error');
+
+    const text = await res.text(); // ← CSV texte brut, pas JSON
+    const data = parseCSV(text);   // ← on parse nous-mêmes
+    allJobs = data;
+    populateTypeFilter(data);
+    renderCards(data);
+  } catch (e) {
+    loading.style.display = 'none';
+    error.style.display   = 'block';
   }
+}
+
 
   function populateTypeFilter(jobs) {
     const sel    = document.getElementById('filterType');
