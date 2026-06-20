@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -419,8 +419,8 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="create">➕ Create Offer</button>
-    <button class="tab-btn" data-tab="manage">📋 Manage Offers</button>
+    <button class="tab-btn active" data-tab="create">Create Offer</button>
+    <button class="tab-btn" data-tab="manage">Manage Offers</button>
   </div>
 
   <!-- ========================================
@@ -431,12 +431,12 @@
     <div class="notice">
       <span class="notice-icon">ℹ️</span>
       <div>
-        <strong>Short Description & Long Description:</strong> Collez le texte de la Job Description existante. Les retours à la ligne et textes longs sont acceptés.
+        <strong>Short Description & Long Description:</strong> Paste the text from existing Job Descriptions. Long texts and line breaks are accepted.
       </div>
     </div>
 
     <div class="success-msg" id="create-success">
-      <span>✅</span> Offre créée avec succès !
+      <span>✅</span> Offer successfully created!
     </div>
     <div class="error-msg" id="create-error">
       <span>❌</span> <span id="error-text"></span>
@@ -492,7 +492,7 @@
           <div class="field">
             <label for="salary">Annual base salary <span class="req">*</span></label>
             <input type="number" id="salary" placeholder="e.g. 38000" min="0" step="1">
-            <span class="field-note">Nombre entier, sans virgule</span>
+            <span class="field-note">Integer number, no comma or symbol</span>
           </div>
 
         </div>
@@ -500,15 +500,15 @@
         <!-- SHORT DESCRIPTION -->
         <div class="field" style="margin-top: 22px;">
           <label for="short-description">Short description <span class="req">*</span></label>
-          <textarea id="short-description" placeholder="Résumé court de l'offre (copier-coller accepté)"></textarea>
-          <span class="field-note">Texte court, max 300 caractères</span>
+          <textarea id="short-description" placeholder="Short summary of the offer (paste is accepted)"></textarea>
+          <span class="field-note">Short text, max 300 characters</span>
         </div>
 
         <!-- LONG DESCRIPTION -->
         <div class="field" style="margin-top: 20px;">
           <label for="long-description">Long description <span class="req">*</span></label>
-          <textarea id="long-description" placeholder="Description complète (copier-coller accepté)"></textarea>
-          <span class="field-note">Texte plus détaillé, accepte les retours à la ligne</span>
+          <textarea id="long-description" placeholder="Complete description (paste is accepted)"></textarea>
+          <span class="field-note">More detailed text, accepts line breaks</span>
         </div>
 
         <!-- REQUIREMENTS -->
@@ -518,8 +518,8 @@
             <ul class="bullet-list" id="requirements-list">
               <li class="bullet-item">
                 <span class="bullet-bullet">•</span>
-                <input type="text" class="bullet-input" placeholder="Ajoutez une exigence..." autocomplete="off">
-                <button type="button" class="bullet-remove" title="Supprimer">✕</button>
+                <input type="text" class="bullet-input" placeholder="Add a requirement..." autocomplete="off">
+                <button type="button" class="bullet-remove" title="Remove">✕</button>
               </li>
             </ul>
             <div class="bullet-controls">
@@ -530,9 +530,7 @@
 
         <!-- SUBMIT -->
         <div style="margin-top: 28px;">
-          <button type="submit" class="btn-primary" id="submit-btn">
-            <span>✅</span> Submit Offer
-          </button>
+          <button type="submit" class="btn-primary" id="submit-btn">Submit Offer</button>
         </div>
 
       </form>
@@ -552,7 +550,7 @@
 
       <div id="manage-loading" class="loading">
         <div class="spinner"></div>
-        <p style="margin-top: 10px;">Chargement des offres...</p>
+        <p style="margin-top: 10px;">Loading offers...</p>
       </div>
 
       <div id="manage-content" style="display: none;">
@@ -560,12 +558,12 @@
           <table class="jobs-table">
             <thead>
               <tr>
-                <th>Titre</th>
-                <th>Établissement</th>
-                <th>Ville</th>
-                <th>Contrat</th>
-                <th>Salaire</th>
-                <th>Statut</th>
+                <th>Title</th>
+                <th>Establishment</th>
+                <th>City</th>
+                <th>Contract</th>
+                <th>Salary</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -576,7 +574,7 @@
       </div>
 
       <div id="manage-empty" style="display: none; text-align: center; padding: 40px 20px; color: var(--text-muted);">
-        <p>Aucune offre trouvée.</p>
+        <p>No offers found.</p>
       </div>
     </div>
 
@@ -600,18 +598,19 @@
      TAB SWITCHING
      ═══════════════════════════════════════════ */
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const tabName = btn.dataset.tab;
 
-      // Désactiver tous les tabs
+      // Deactivate all tabs
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-      // Activer le tab cliqué
+      // Activate clicked tab
       btn.classList.add('active');
       document.getElementById(tabName).classList.add('active');
 
-      // Si tab manage, charger les offres
+      // If manage tab, load jobs
       if (tabName === 'manage') {
         loadJobs();
       }
@@ -627,8 +626,8 @@
     li.className = 'bullet-item';
     li.innerHTML = `
       <span class="bullet-bullet">•</span>
-      <input type="text" class="bullet-input" placeholder="Ajoutez une exigence..." autocomplete="off">
-      <button type="button" class="bullet-remove" title="Supprimer">✕</button>
+      <input type="text" class="bullet-input" placeholder="Add a requirement..." autocomplete="off">
+      <button type="button" class="bullet-remove" title="Remove">✕</button>
     `;
 
     li.querySelector('.bullet-remove').addEventListener('click', (e) => {
@@ -668,14 +667,14 @@
      ═══════════════════════════════════════════ */
   function validateForm() {
     const required = ['job-title', 'establishment', 'city', 'district', 'contract-type', 'salary', 'short-description', 'long-description'];
-    let valid = true;
+    let emptyFields = [];
 
     required.forEach(id => {
       const el = document.getElementById(id);
       const val = el.value.trim();
       if (!val) {
         el.style.borderColor = 'var(--warning)';
-        valid = false;
+        emptyFields.push(id);
       } else {
         el.style.borderColor = '';
       }
@@ -683,20 +682,24 @@
 
     const requirements = getBulletText('requirements-list');
     if (!requirements) {
-      valid = false;
-      showError('Requirements cannot be empty');
-      return valid;
+      showError('Please add at least one requirement');
+      return false;
     }
 
-    return valid;
+    if (emptyFields.length > 0) {
+      showError(`Please fill in all required fields`);
+      return false;
+    }
+
+    return true;
   }
 
   /* ═══════════════════════════════════════════
      MESSAGES
      ═══════════════════════════════════════════ */
-  function showSuccess(msg = 'Offre créée avec succès !') {
+  function showSuccess(msg = 'Offer successfully created!') {
     const el = document.getElementById('create-success');
-    el.textContent = msg;
+    el.innerHTML = '<span>✅</span> ' + msg;
     el.classList.add('visible');
     setTimeout(() => el.classList.remove('visible'), 3500);
   }
@@ -706,6 +709,10 @@
     const textEl = document.getElementById('error-text');
     textEl.textContent = msg;
     el.classList.add('visible');
+    
+    // Scroll to error message
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
     setTimeout(() => el.classList.remove('visible'), 4000);
   }
 
@@ -716,13 +723,12 @@
     e.preventDefault();
 
     if (!validateForm()) {
-      showError('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     const submitBtn = document.getElementById('submit-btn');
     submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Envoi...';
+    submitBtn.textContent = 'Sending...';
 
     const payload = {
       'Job title': document.getElementById('job-title').value.trim(),
@@ -745,7 +751,7 @@
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur ${response.status}`);
+        throw new Error(`Error ${response.status}`);
       }
 
       // Reset form
@@ -754,17 +760,23 @@
       document.getElementById('requirements-list').innerHTML = `
         <li class="bullet-item">
           <span class="bullet-bullet">•</span>
-          <input type="text" class="bullet-input" placeholder="Ajoutez une exigence..." autocomplete="off">
-          <button type="button" class="bullet-remove" title="Supprimer">✕</button>
+          <input type="text" class="bullet-input" placeholder="Add a requirement..." autocomplete="off">
+          <button type="button" class="bullet-remove" title="Remove">✕</button>
         </li>
       `;
 
-      showSuccess('✅ Offre créée et synchronisée avec Google Sheets !');
+      // Rebind remove button
+      document.querySelector('#requirements-list .bullet-remove').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.target.closest('.bullet-item').remove();
+      });
+
+      showSuccess('Offer successfully created and synced with Google Sheets!');
     } catch (error) {
-      showError(`Erreur d'envoi: ${error.message}`);
+      showError(`Error sending: ${error.message}`);
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<span>✅</span> Submit Offer';
+      submitBtn.textContent = 'Submit Offer';
     }
   });
 
@@ -794,9 +806,9 @@
 
       tbody.innerHTML = '';
       jobs.forEach((job, idx) => {
-        const tr = document.createElement('tr');
         const status = job.Status && job.Status.toLowerCase() === 'active' ? 'active' : 'inactive';
 
+        const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="job-title-cell">${escapeHtml(job['Job title'] || '')}</td>
           <td>
@@ -814,9 +826,9 @@
           <td>
             <div class="action-buttons">
               <button class="btn-small btn-toggle ${status === 'inactive' ? 'inactive' : ''}` data-idx="${idx}" data-status="${status}">
-                ${status === 'active' ? '👁️ Hide' : '🚫 Show'}
+                ${status === 'active' ? 'Hide' : 'Show'}
               </button>
-              <button class="btn-small btn-delete" data-idx="${idx}">🗑️ Delete</button>
+              <button class="btn-small btn-delete" data-idx="${idx}">Delete</button>
             </div>
           </td>
         `;
@@ -826,7 +838,8 @@
 
       // Bind toggle buttons
       tbody.querySelectorAll('.btn-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const idx = parseInt(btn.dataset.idx);
           const currentStatus = btn.dataset.status;
           const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -836,7 +849,8 @@
 
       // Bind delete buttons
       tbody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const idx = parseInt(btn.dataset.idx);
           deleteJob(jobs[idx]);
         });
@@ -845,7 +859,7 @@
       loading.style.display = 'none';
       content.style.display = 'block';
     } catch (error) {
-      console.error('Erreur chargement CSV:', error);
+      console.error('Error loading CSV:', error);
       loading.style.display = 'none';
       empty.style.display = 'block';
     }
@@ -916,23 +930,21 @@
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error(`Erreur ${response.status}`);
+      if (!response.ok) throw new Error(`Error ${response.status}`);
 
-      showSuccess(`Statut changé en ${newStatus === 'active' ? 'Active' : 'Inactive'}`);
+      showSuccess(`Status changed to ${newStatus === 'active' ? 'Active' : 'Inactive'}`);
       loadJobs();
     } catch (error) {
-      showError(`Erreur: ${error.message}`);
+      showError(`Error: ${error.message}`);
     }
   }
 
   /* ═══════════════════════════════════════════
-     DELETE JOB (mark as deleted or remove)
+     DELETE JOB
      ═══════════════════════════════════════════ */
   async function deleteJob(job) {
-    if (!confirm(`Supprimer l'offre "${job['Job title']}" ?`)) return;
+    if (!confirm(`Delete the offer "${job['Job title']}"?`)) return;
 
-    // Option 1: Supprimer complètement (à adapter selon n8n)
-    // Option 2: Marquer comme inactive + ajouter un flag delete
     const payload = { ...job, Status: 'deleted' };
 
     try {
@@ -942,12 +954,12 @@
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) throw new Error(`Erreur ${response.status}`);
+      if (!response.ok) throw new Error(`Error ${response.status}`);
 
-      showSuccess('Offre supprimée');
+      showSuccess('Offer deleted');
       loadJobs();
     } catch (error) {
-      showError(`Erreur suppression: ${error.message}`);
+      showError(`Delete error: ${error.message}`);
     }
   }
 
