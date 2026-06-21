@@ -105,11 +105,10 @@ function parseCSV(text) {
 }
 
   // ============================================================
-  // LOAD JOBS
-  // ============================================================
-  allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
+// LOAD JOBS
+// ============================================================
 
-  async function loadJobs() {
+async function loadJobs() {
   const grid    = document.getElementById('jobsGrid');
   const loading = document.getElementById('jobsLoading');
   const error   = document.getElementById('jobsError');
@@ -121,12 +120,12 @@ function parseCSV(text) {
   grid.innerHTML        = '';
 
   try {
-   const res  = await fetch(SHEET_URL);
-if (!res.ok) throw new Error('Network error');
-const data = await res.json();
-allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
-populateTypeFilter(allJobs);
-renderCards(allJobs);
+    const res  = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('Network error');
+    const data = await res.json();
+    allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
+    populateTypeFilter(allJobs);
+    renderCards(allJobs);
   } catch (e) {
     loading.style.display = 'none';
     error.style.display   = 'block';
