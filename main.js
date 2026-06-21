@@ -107,7 +107,7 @@ function parseCSV(text) {
   // ============================================================
   // LOAD JOBS
   // ============================================================
-  let allJobs = [];
+  allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
 
   async function loadJobs() {
   const grid    = document.getElementById('jobsGrid');
@@ -121,14 +121,12 @@ function parseCSV(text) {
   grid.innerHTML        = '';
 
   try {
-    const res = await fetch(SHEET_URL);
-    if (!res.ok) throw new Error('Network error');
-
-    const text = await res.text(); // ← CSV texte brut, pas JSON
-    const data = parseCSV(text);   // ← on parse nous-mêmes
-    const visibleJobs = allJobs.filter(j => j['Status'] !== 'Hidden');
-    populateTypeFilter(visibleJobs);
-    renderCards(visibleJobs);
+   const res  = await fetch(SHEET_URL);
+if (!res.ok) throw new Error('Network error');
+const data = await res.json();
+allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
+populateTypeFilter(allJobs);
+renderCards(allJobs);
   } catch (e) {
     loading.style.display = 'none';
     error.style.display   = 'block';
