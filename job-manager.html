@@ -543,8 +543,7 @@
   // ══════════════════════════════════════════════════
   const WEBHOOK_ADD    = 'https://n8n.strength-os.tech/webhook/job-managment';
   const WEBHOOK_UPDATE = 'https://n8n.strength-os.tech/webhook/job-update';
-  const WEBHOOK_DELETE = 'https://n8n.strength-os.tech/webhook/job-delete';
-  const CSV_URL        = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRkoXsy6784kZL208ovB7oJojrLH2hwXuEysJ9ldNB019THeB6oGHTgNHE5gVUXv5SLVYfH-KPr24o/pub?output=csv';
+  const CSV_URL        = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyMUBGgcev-QNFR998-lUvC5bsAuAabM-IkPt2vlLCpjWTOAXVj3jhK_wV0COYcpkvu5OhFe8gJqfB/pub?gid=0&single=true&output=csv';
 
   // ══════════════════════════════════════════════════
   // TABS
@@ -794,43 +793,6 @@
       toggleBtn.textContent = newStatus === 'hidden' ? 'Hide' : 'Activate';
     }
   }
-
-  // ══════════════════════════════════════════════════
-  // DELETE
-  // ══════════════════════════════════════════════════
-  let pendingDelete = null;
-
-  function openDeleteModal(job, rowEl) {
-    pendingDelete = { job, rowEl };
-    document.getElementById('delete-modal-text').textContent =
-      `"${job['Job title']}" at ${job['Establishment']} will be permanently deleted.`;
-    document.getElementById('delete-modal').classList.add('open');
-  }
-
-  document.getElementById('delete-cancel').addEventListener('click', () => {
-    document.getElementById('delete-modal').classList.remove('open');
-    pendingDelete = null;
-  });
-
-  document.getElementById('delete-confirm').addEventListener('click', async () => {
-    if (!pendingDelete) return;
-    const { job, rowEl } = pendingDelete;
-    document.getElementById('delete-modal').classList.remove('open');
-
-    try {
-      const res = await fetch(WEBHOOK_DELETE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 'Job title': job['Job title'] })
-      });
-      if (!res.ok) throw new Error();
-      showAlert('manage-alert-success', `✅ "${job['Job title']}" deleted successfully.`);
-      rowEl.remove();
-    } catch {
-      showAlert('manage-alert-error', '❌ Delete failed. Please try again.');
-    }
-    pendingDelete = null;
-  });
 
   // ══════════════════════════════════════════════════
   // REFRESH
