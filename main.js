@@ -119,22 +119,27 @@ async function loadJobs() {
   grid.innerHTML        = '';
 
   try {
+    console.log('SHEET_URL utilisé:', SHEET_URL);
     const res = await fetch(SHEET_URL);
+    console.log('Status HTTP:', res.status, res.ok);
     if (!res.ok) throw new Error('Network error');
 
-    const text = await res.text();                          // ← CSV brut (pas .json())
-    const data = parseCSV(text);                            // ← parse manuel
-    allJobs = data.filter(j =>                              // ← filtre active
+    const text = await res.text();
+    const data = parseCSV(text);
+    allJobs = data.filter(j =>
       (j['Status'] || '').trim().toLowerCase() === 'active'
     );
     populateTypeFilter(allJobs);
     renderCards(allJobs);
 
   } catch (e) {
+    console.error('❌ ERREUR COMPLETE:', e);
+    console.error('Message:', e.message);
     loading.style.display = 'none';
     error.style.display   = 'block';
   }
 }
+
 
 
   // ============================================================
