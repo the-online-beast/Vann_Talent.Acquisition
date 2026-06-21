@@ -204,7 +204,7 @@ async function loadJobs() {
     const title    = job['Job title']           || '';
     const school   = job['Establishment']       || '';
     const city     = job['City']               || '';
-    const district = job['Discrict']           || '';
+    const district = job['District']           || '';
     const type     = job['Contract type']       || '';
     const salary   = job['Annual base salary'] || '';
     const longDesc = job['Long description']    || '';
