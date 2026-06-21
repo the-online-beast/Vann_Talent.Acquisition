@@ -110,66 +110,32 @@ let allJobs = [];
 async function loadJobs() {
   const grid    = document.getElementById('jobsGrid');
   const loading = document.getElementById('jobsLoading');
+  const error   = document.getElementById('jobsError');
   const empty   = document.getElementById('jobsEmpty');
-  const error   = document.getElementById('jobsError'); // si tu as un bloc erreur
 
-  if (loading) loading.style.display = 'block';
-  if (empty)   empty.style.display   = 'none';
-  if (grid)    grid.innerHTML         = '';
+  loading.style.display = 'block';
+  error.style.display   = 'none';
+  empty.style.display   = 'none';
+  grid.innerHTML        = '';
 
   try {
-    // Cache-bust pour éviter les problèmes de cache GitHub
-    const url = SHEET_URL + '&nocache=' + Date.now();
-    console.log('🔄 Fetching:', url);
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('Network error');
 
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    }
-
-    const text = await res.text();
-    console.log('📄 CSV brut (100 premiers chars):', text.substring(0, 100));
-
-    const jobs = parseCSV(text);
-    console.log('✅ Jobs avant filtre status:', jobs.length, jobs);
-
-    // Filtre : uniquement les offres "active"
-    // Correction : trim() + toLowerCase() + gestion valeur vide
-    allJobs = jobs.filter(j => {
-      const status = (j['Status'] || j['status'] || 'active').trim().toLowerCase();
-      console.log(`  → Job "${j['Job title']}" status: "${status}"`);
-      return status === 'active';
-    });
-
-    console.log('✅ Jobs actifs:', allJobs.length);
-
-    if (loading) loading.style.display = 'none';
-
-    if (!allJobs.length) {
-      if (empty) empty.style.display = 'block';
-      return;
-    }
-
+    const text = await res.text();                          // ← CSV brut (pas .json())
+    const data = parseCSV(text);                            // ← parse manuel
+    allJobs = data.filter(j =>                              // ← filtre active
+      (j['Status'] || '').trim().toLowerCase() === 'active'
+    );
     populateTypeFilter(allJobs);
     renderCards(allJobs);
 
-  } catch (err) {
-    console.error('❌ Erreur loadJobs:', err);
-    if (loading) loading.style.display = 'none';
-
-    // Affiche l'erreur à l'utilisateur
-    const errorEl = document.getElementById('jobsError');
-    if (errorEl) {
-      errorEl.style.display = 'block';
-      errorEl.innerHTML = `
-        Could not load vacancies. 
-        <br><small style="color:#999">${err.message}</small>
-        <br><button id="retryBtn" onclick="loadJobs()">Retry</button>
-      `;
-    }
+  } catch (e) {
+    loading.style.display = 'none';
+    error.style.display   = 'block';
   }
 }
+
 
   // ============================================================
   // FILTERS
