@@ -52,13 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 // ============================================================
-// CSV PARSER
+// CSV PARSER — version robuste
 // ============================================================
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
+  // Nettoie les retours chariot Windows (\r\n)
+  const lines = text.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
   if (lines.length < 2) return [];
 
-  // Parse une ligne CSV en tenant compte des guillemets
   function parseLine(line) {
     const cols = [];
     let cur = '';
@@ -66,9 +66,7 @@ function parseCSV(text) {
 
     for (let i = 0; i < line.length; i++) {
       const ch = line[i];
-
       if (ch === '"') {
-        // Guillemet double à l'intérieur d'un champ entre guillemets → escape
         if (inQuotes && line[i + 1] === '"') {
           cur += '"';
           i++;
@@ -87,105 +85,91 @@ function parseCSV(text) {
   }
 
   const headers = parseLine(lines[0]);
-  const jobs = [];
+  console.log('📋 CSV Headers détectés:', headers); // DEBUG
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
+  const rows = lines.slice(1).map(line => {
     const values = parseLine(line);
     const obj = {};
-    headers.forEach((h, idx) => {
-      obj[h.trim()] = values[idx] !== undefined ? values[idx] : '';
+    headers.forEach((h, i) => {
+      // Nettoyage des clés (supprime BOM, espaces, caractères invisibles)
+      const cleanKey = h.replace(/^\uFEFF/, '').replace(/\s+/g, ' ').trim();
+      obj[cleanKey] = values[i] || '';
     });
-    jobs.push(obj);
-  }
+    return obj;
+  }).filter(row => Object.values(row).some(v => v !== ''));
 
-  return jobs;
+  console.log('📊 Tous les jobs parsés:', rows); // DEBUG
+  return rows;
 }
 
-  // ============================================================
-// LOAD JOBS
 // ============================================================
+// LOAD JOBS — version corrigée
+// ============================================================
+let allJobs = [];
 
 async function loadJobs() {
   const grid    = document.getElementById('jobsGrid');
   const loading = document.getElementById('jobsLoading');
-  const error   = document.getElementById('jobsError');
   const empty   = document.getElementById('jobsEmpty');
+  const error   = document.getElementById('jobsError'); // si tu as un bloc erreur
 
-  loading.style.display = 'block';
-  error.style.display   = 'none';
-  empty.style.display   = 'none';
-  grid.innerHTML        = '';
+  if (loading) loading.style.display = 'block';
+  if (empty)   empty.style.display   = 'none';
+  if (grid)    grid.innerHTML         = '';
 
   try {
-    const res  = await fetch(SHEET_URL);
-    if (!res.ok) throw new Error('Network error');
-    const data = await res.json();
-    allJobs = data.filter(j => j['Status'] !== 'Hidden' && j['Status'] !== 'hidden');
-    populateTypeFilter(allJobs);
-    renderCards(allJobs);
-  } catch (e) {
-    loading.style.display = 'none';
-    error.style.display   = 'block';
-  }
-}
+    // Cache-bust pour éviter les problèmes de cache GitHub
+    const url = SHEET_URL + '&nocache=' + Date.now();
+    console.log('🔄 Fetching:', url);
 
+    const res = await fetch(url);
 
-  function populateTypeFilter(jobs) {
-    const sel    = document.getElementById('filterType');
-    const types  = [...new Set(jobs.map(j => j['Contract type']).filter(Boolean))];
-    types.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      sel.appendChild(opt);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+
+    const text = await res.text();
+    console.log('📄 CSV brut (100 premiers chars):', text.substring(0, 100));
+
+    const jobs = parseCSV(text);
+    console.log('✅ Jobs avant filtre status:', jobs.length, jobs);
+
+    // Filtre : uniquement les offres "active"
+    // Correction : trim() + toLowerCase() + gestion valeur vide
+    allJobs = jobs.filter(j => {
+      const status = (j['Status'] || j['status'] || 'active').trim().toLowerCase();
+      console.log(`  → Job "${j['Job title']}" status: "${status}"`);
+      return status === 'active';
     });
-  }
 
-  function renderCards(jobs) {
-    const grid    = document.getElementById('jobsGrid');
-    const loading = document.getElementById('jobsLoading');
-    const empty   = document.getElementById('jobsEmpty');
+    console.log('✅ Jobs actifs:', allJobs.length);
 
-    loading.style.display = 'none';
-    grid.innerHTML        = '';
+    if (loading) loading.style.display = 'none';
 
-    if (!jobs.length) {
-      empty.style.display = 'block';
+    if (!allJobs.length) {
+      if (empty) empty.style.display = 'block';
       return;
     }
 
-    document.getElementById('vacanciesCount').textContent = `${jobs.length} position${jobs.length > 1 ? 's' : ''} available`;
+    populateTypeFilter(allJobs);
+    renderCards(allJobs);
 
-    jobs.forEach((job, idx) => {
-      const realIdx = allJobs.indexOf(job);
-      const title    = job['Job title']           || 'Untitled';
-      const school   = job['Establishment']       || '';
-      const city     = job['City']               || '';
-      const district = job['Discrict']           || '';
-      const type     = job['Contract type']       || '';
-      const salary   = job['Annual base salary'] || '';
-      const shortDesc = job['Short description'] || '';
+  } catch (err) {
+    console.error('❌ Erreur loadJobs:', err);
+    if (loading) loading.style.display = 'none';
 
-      const card = document.createElement('article');
-      card.className   = 'job-card';
-      card.dataset.idx = idx;
-      card.innerHTML = `
-        <div class="job-card__top">
-          ${type ? `<span class="tag">${escapeHtml(type)}</span>` : ''}
-        </div>
-        <h3 class="job-card__title">${escapeHtml(title)}</h3>
-        <p class="job-card__school">${escapeHtml(school)}${city ? ` · ${escapeHtml(city)}` : ''}</p>
-        ${salary ? `<p class="job-card__salary">${escapeHtml(salary)}</p>` : ''}
-        ${shortDesc ? `<p class="job-card__desc">${escapeHtml(shortDesc)}</p>` : ''}
-        <span class="job-card__cta">View details →</span>
+    // Affiche l'erreur à l'utilisateur
+    const errorEl = document.getElementById('jobsError');
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = `
+        Could not load vacancies. 
+        <br><small style="color:#999">${err.message}</small>
+        <br><button id="retryBtn" onclick="loadJobs()">Retry</button>
       `;
-      card.addEventListener('click', () => openJobDetail(realIdx));
-      grid.appendChild(card);
-    });
+    }
   }
+}
 
   // ============================================================
   // FILTERS
