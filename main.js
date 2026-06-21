@@ -160,6 +160,7 @@ async function loadJobs() {
     document.getElementById('vacanciesCount').textContent = `${jobs.length} position${jobs.length > 1 ? 's' : ''} available`;
 
     jobs.forEach((job, idx) => {
+      const realIdx = allJobs.indexOf(job);
       const title    = job['Job title']           || 'Untitled';
       const school   = job['Establishment']       || '';
       const city     = job['City']               || '';
@@ -181,7 +182,7 @@ async function loadJobs() {
         ${shortDesc ? `<p class="job-card__desc">${escapeHtml(shortDesc)}</p>` : ''}
         <span class="job-card__cta">View details →</span>
       `;
-      card.addEventListener('click', () => openJobDetail(idx));
+      card.addEventListener('click', () => openJobDetail(realIdx));
       grid.appendChild(card);
     });
   }
