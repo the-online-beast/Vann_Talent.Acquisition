@@ -111,30 +111,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderCards(jobs) {
-    const grid    = document.getElementById('jobsGrid');
-    const loading = document.getElementById('jobsLoading');
-    const empty   = document.getElementById('jobsEmpty');
+  const grid    = document.getElementById('jobsGrid');
+  const loading = document.getElementById('jobsLoading');
+  const empty   = document.getElementById('jobsEmpty');
 
-    loading.style.display = 'none';
+  loading.style.display = 'none';
 
-    if (!jobs.length) {
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    grid.innerHTML = jobs.map((job, idx) => `
-      <div class="job-card" data-idx="${idx}">
-        <h3>${escapeHtml(job['Job title'] || '')}</h3>
-        <p>${escapeHtml(job['Establishment'] || '')} — ${escapeHtml(job['City'] || '')}</p>
-        <span>${escapeHtml(job['Contract type'] || '')}</span>
-      </div>
-    `).join('');
-
-    grid.querySelectorAll('.job-card').forEach(card => {
-      card.addEventListener('click', () => openJobDetail(Number(card.dataset.idx)));
-    });
+  if (!jobs.length) {
+    empty.style.display = 'block';
+    return;
   }
+  empty.style.display = 'none';
+
+  grid.innerHTML = jobs.map((job, idx) => `
+    <div class="job-card" data-idx="${idx}">
+      <div class="job-card-header">
+        <h3 class="job-card-title">${escapeHtml(job['Job title'] || '')}</h3>
+        <span class="job-card-type">${escapeHtml(job['Contract type'] || '')}</span>
+      </div>
+      <p class="job-card-school">${escapeHtml(job['Establishment'] || '')}${job['City'] ? ' — ' + escapeHtml(job['City']) : ''}${job['District'] ? ' · ' + escapeHtml(job['District']) : ''}</p>
+      ${job['Annual base salary'] ? `<p class="job-card-salary">💰 ${escapeHtml(job['Annual base salary'])}</p>` : ''}
+      ${job['Short description'] ? `<p class="job-card-desc">${escapeHtml(job['Short description'])}</p>` : ''}
+      <button class="job-card-btn">View details →</button>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.job-card').forEach(card => {
+    card.addEventListener('click', () => openJobDetail(Number(card.dataset.idx)));
+  });
+}
+
 
   async function loadJobs() {
     const grid    = document.getElementById('jobsGrid');
