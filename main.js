@@ -491,28 +491,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadJobs() {
-    showState('loading');
-    try {
-      const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShPwLyNkrFmUkec8htH_XDfdE3XnNhyGBNlAC3ex8fxfViGYSl06QfGIG3AY96GCfoNggDfxxl0ROn/pub?output=csv';
-      
-      const res = await fetch(SHEET_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const grid    = document.getElementById('jobsGrid');
+  const loading = document.getElementById('jobsLoading');
+  const error   = document.getElementById('jobsError');
+  const empty   = document.getElementById('jobsEmpty');
 
-      const csv = await res.text();
-      // ✅ Enlève le filtre sur Status si la colonne n'existe pas
-      allJobs = parseCSV(csv).filter(job => job.Title && job.Title.trim() !== '');
+  loading.style.display = 'block';
+  error.style.display   = 'none';
+  empty.style.display   = 'none';
+  grid.innerHTML        = '';
 
-      if (allJobs.length === 0) {
-        showState('empty');
-      } else {
-        showState('results', allJobs.length);
-        renderCards(allJobs);
-      }
-    } catch (err) {
-      console.error('[VS Recruitment] Failed to load jobs:', err);
-      showState('error');
-    }
+  try {
+    const res = await fetch(SHEET_URL + '&nocache=' + Date.now());
+    if (!res.ok) throw new Error('Network error');
+
+    const text = await res.text();
+    const data = parseCSV(text);
+
+    // Filtre uniquement les offres actives
+    allJobs = data.filter(j => {
+      const status = (j['Status'] || '').trim().toLowerCase();
+      return status === 'active';
+    });
+
+    populateTypeFilter(allJobs);
+    renderCards(allJobs);
+
+  } catch (e) {
+    console.error('loadJobs error:', e);
+    loading.style.display = 'none';
+    error.style.display   = 'block';
   }
+}
+
 
   // ============================================================
   // VACANCIES — Render Cards
