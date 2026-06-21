@@ -1,5 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
+async function loadJobs() {
+  const grid    = document.getElementById('jobsGrid');
+  const loading = document.getElementById('jobsLoading');
+  const error   = document.getElementById('jobsError');
+  const empty   = document.getElementById('jobsEmpty');
 
+  loading.style.display = 'block';
+  error.style.display   = 'none';
+  empty.style.display   = 'none';
+  grid.innerHTML        = '';
+
+  try {
+    console.log('SHEET_URL utilisé:', SHEET_URL);
+    const res = await fetch(SHEET_URL);
+    console.log('Status HTTP:', res.status, res.ok);
+    if (!res.ok) throw new Error('Network error');
+
+    const text = await res.text();
+    const data = parseCSV(text);
+    allJobs = data.filter(j =>
+      (j['Status'] || '').trim().toLowerCase() === 'active'
+    );
+    populateTypeFilter(allJobs);
+    renderCards(allJobs);
+
+  }
   // ============================================================
   // UTILS
   // ============================================================
@@ -107,32 +132,7 @@ function parseCSV(text) {
 // ============================================================
 let allJobs = [];
 
-async function loadJobs() {
-  const grid    = document.getElementById('jobsGrid');
-  const loading = document.getElementById('jobsLoading');
-  const error   = document.getElementById('jobsError');
-  const empty   = document.getElementById('jobsEmpty');
-
-  loading.style.display = 'block';
-  error.style.display   = 'none';
-  empty.style.display   = 'none';
-  grid.innerHTML        = '';
-
-  try {
-    console.log('SHEET_URL utilisé:', SHEET_URL);
-    const res = await fetch(SHEET_URL);
-    console.log('Status HTTP:', res.status, res.ok);
-    if (!res.ok) throw new Error('Network error');
-
-    const text = await res.text();
-    const data = parseCSV(text);
-    allJobs = data.filter(j =>
-      (j['Status'] || '').trim().toLowerCase() === 'active'
-    );
-    populateTypeFilter(allJobs);
-    renderCards(allJobs);
-
-  } catch (e) {
+ catch (e) {
     console.error('❌ ERREUR COMPLETE:', e);
     console.error('Message:', e.message);
     loading.style.display = 'none';
