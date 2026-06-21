@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const error   = document.getElementById('jobsError');
   const empty   = document.getElementById('jobsEmpty');
 
-  loading.style.display = 'block';
+  loading.style.display = 'block'; 
   error.style.display   = 'none';
   empty.style.display   = 'none';
   grid.innerHTML        = '';
