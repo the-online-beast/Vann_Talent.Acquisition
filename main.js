@@ -124,17 +124,22 @@ document.addEventListener('DOMContentLoaded', () => {
   empty.style.display = 'none';
 
   grid.innerHTML = jobs.map((job, idx) => `
-    <div class="job-card" data-idx="${idx}">
-      <div class="job-card-header">
-        <h3 class="job-card-title">${escapeHtml(job['Job title'] || '')}</h3>
-        <span class="job-card-type">${escapeHtml(job['Contract type'] || '')}</span>
-      </div>
-      <p class="job-card-school">${escapeHtml(job['Establishment'] || '')}${job['City'] ? ' — ' + escapeHtml(job['City']) : ''}${job['District'] ? ' · ' + escapeHtml(job['District']) : ''}</p>
-      ${job['Annual base salary'] ? `<p class="job-card-salary">💰 ${escapeHtml(job['Annual base salary'])}</p>` : ''}
-      ${job['Short description'] ? `<p class="job-card-desc">${escapeHtml(job['Short description'])}</p>` : ''}
-      <button class="job-card-btn">View details →</button>
+  <div class="job-card" data-idx="${idx}">
+    <div class="job-card-header">
+      <h3 class="job-card-title">${escapeHtml(job['Job title'] || '')}</h3>
+      <span class="job-card-type">${escapeHtml(job['Contract type'] || '')}</span>
     </div>
-  `).join('');
+    <p class="job-card-location">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      ${escapeHtml(job['City'] || '')}${job['District'] ? ' · ' + escapeHtml(job['District']) : ''}
+    </p>
+    <p class="job-card-school">${escapeHtml(job['Establishment'] || '')}</p>
+    ${job['Annual base salary'] ? `<p class="job-card-salary">${escapeHtml(job['Annual base salary'])} / year</p>` : ''}
+    ${job['Short description'] ? `<p class="job-card-desc">${escapeHtml(job['Short description'])}</p>` : ''}
+    <button class="job-card-btn">View details →</button>
+  </div>
+`).join('');
+
 
   grid.querySelectorAll('.job-card').forEach(card => {
     card.addEventListener('click', () => openJobDetail(Number(card.dataset.idx)));
