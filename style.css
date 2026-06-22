@@ -308,6 +308,9 @@ button { cursor: pointer; font-family: inherit; }
 }
 .jobs-state--error { color: #c0392b; }
 
+/* ============================================================
+   JOB CARD
+============================================================ */
 .job-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -315,32 +318,51 @@ button { cursor: pointer; font-family: inherit; }
   padding: 24px;
   cursor: pointer;
   transition: box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .job-card:hover {
   box-shadow: var(--shadow-md);
   border-color: var(--accent);
 }
-.job-card__top { margin-bottom: 10px; }
+.job-card__top {
+  margin-bottom: 6px;
+}
 .job-card__title {
   font-size: 1.05rem;
   font-weight: 600;
-  margin-bottom: 4px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.job-card__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.job-card__location svg {
+  flex-shrink: 0;
+  color: var(--muted);
 }
 .job-card__school {
   font-size: 0.85rem;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .job-card__salary {
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--accent);
-  margin-bottom: 10px;
+  margin-top: 4px;
 }
 .job-card__desc {
   font-size: 0.85rem;
   color: var(--muted);
-  margin-bottom: 14px;
+  margin-top: 4px;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -351,6 +373,8 @@ button { cursor: pointer; font-family: inherit; }
   font-weight: 500;
   color: var(--muted);
   transition: color 0.2s;
+  margin-top: auto;
+  padding-top: 10px;
 }
 .job-card:hover .job-card__cta { color: var(--accent); }
 
