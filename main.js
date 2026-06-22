@@ -93,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const obj = {};
       headers.forEach((h, i) => {
         const cleanKey = h.replace(/^\uFEFF/, '').replace(/\s+/g, ' ').trim();
-        obj[cleanKey] = values[i] || '';
+        obj[cleanKey] = (values[i] || '').replace(/^"|"$/g, '').replace(/[\r\n]/g, '').trim();
+
       });
       return obj;
     }).filter(row => Object.values(row).some(v => v !== ''));
