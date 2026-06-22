@@ -128,32 +128,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!jobs.length) {
     empty.style.display = 'block';
+    grid.innerHTML = '';
     return;
   }
   empty.style.display = 'none';
 
   grid.innerHTML = jobs.map((job, idx) => `
-  <div class="job-card" data-idx="${idx}">
-    <div class="job-card-header">
-      <h3 class="job-card-title">${escapeHtml(job['Job title'] || '')}</h3>
-      <span class="job-card-type">${escapeHtml(job['Contract type'] || '')}</span>
+    <div class="job-card" data-idx="${idx}">
+      <div class="job-card__top">
+        <span class="job-card__title">${escapeHtml(job['Job title'] || '')}</span>
+        <span class="job-card__type">${escapeHtml(job['Contract type'] || '')}</span>
+      </div>
+      <div class="job-card__meta">
+        <span class="job-card__location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${escapeHtml(job['City'] || '')}
+        </span>
+        ${job['Establishment'] ? `<span class="job-card__school">${escapeHtml(job['Establishment'])}</span>` : ''}
+        ${job['Annual base salary'] ? `<span class="job-card__salary">${escapeHtml(job['Annual base salary'])} / year</span>` : ''}
+      </div>
+      <span class="job-card__cta">View details →</span>
     </div>
-    <p class="job-card-location">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      ${escapeHtml(job['City'] || '')}${job['District'] ? ' · ' + escapeHtml(job['District']) : ''}
-    </p>
-    <p class="job-card-school">${escapeHtml(job['Establishment'] || '')}</p>
-    ${job['Annual base salary'] ? `<p class="job-card-salary">${escapeHtml(job['Annual base salary'])} / year</p>` : ''}
-    ${job['Short description'] ? `<p class="job-card-desc">${escapeHtml(job['Short description'])}</p>` : ''}
-    <button class="job-card-btn">View details →</button>
-  </div>
-`).join('');
-
+  `).join('');
 
   grid.querySelectorAll('.job-card').forEach(card => {
     card.addEventListener('click', () => openJobDetail(Number(card.dataset.idx)));
   });
 }
+
 
 
   async function loadJobs() {
