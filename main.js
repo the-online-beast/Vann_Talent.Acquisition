@@ -214,30 +214,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   // JOB DETAIL MODAL
   // ============================================================
-  const jobModal = document.getElementById('jobModal');
-
   function openJobDetail(idx) {
-    const job      = allJobs[idx];
-    const title    = job['Job title']          || '';
-    const school   = job['Establishment']      || '';
-    const city     = job['City']               || '';
-    const district = job['District']           || '';
-    const type     = job['Contract type']      || '';
-    const salary   = job['Annual base salary'] || '';
-    const longDesc = job['Long description']   || '';
-    const reqs     = job['Requirements']       || '';
+  const job      = allJobs[idx];
+  const title    = job['Job title']          || '';
+  const school   = job['Establishment']      || '';
+  const city     = job['City']               || '';
+  const type     = job['Contract type']      || '';
+  const salary   = job['Annual base salary'] || '';
+  const longDesc = job['Long description']   || '';
+  const reqs     = job['Requirements']       || '';
 
-    document.getElementById('jd-title').textContent         = title;
-    document.getElementById('jd-type').textContent          = type;
-    document.getElementById('jd-location-text').textContent = city + (district ? ` · ${district}` : '');
-    document.getElementById('jd-salary-text').textContent   = salary;
-    document.getElementById('jd-school').textContent        = school;
-    document.getElementById('jd-district').textContent      = district;
-    document.getElementById('jd-description').innerHTML     = formatText(longDesc);
-    document.getElementById('jd-requirements').innerHTML    = formatText(reqs);
+  document.getElementById('jd-title').textContent         = title;
+  document.getElementById('jd-type').textContent          = type;
+  document.getElementById('jd-location-text').textContent = city;
+  document.getElementById('jd-salary-text').textContent   = salary;
+  document.getElementById('jd-school').textContent        = school;
+  document.getElementById('jd-description').innerHTML     = formatText(longDesc);
+  document.getElementById('jd-requirements').innerHTML    = formatText(reqs);
 
-    openModal(jobModal);
-  }
+  openModal(jobModal);
+}
 
   document.getElementById('closeJobModal')?.addEventListener('click', () => closeModal(jobModal));
   document.getElementById('jd-applyBtn')?.addEventListener('click', () => {
