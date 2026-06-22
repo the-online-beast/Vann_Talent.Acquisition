@@ -12,14 +12,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function formatText(raw) {
-    if (!raw) return '';
-    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-    const isList = lines.every(l => /^[-•*]/.test(l));
-    if (isList) {
-      return '<ul>' + lines.map(l => `<li>${escapeHtml(l.replace(/^[-•*]\s*/, ''))}</li>`).join('') + '</ul>';
-    }
-    return lines.map(l => `<p>${escapeHtml(l)}</p>`).join('');
+  if (!raw) return '';
+
+  // Convertit [BR] en vrais sauts de ligne pour le traitement
+  const normalized = raw.replace(/\[BR\]/g, '\n');
+  const lines = normalized.split('\n').map(l => l.trim()).filter(Boolean);
+
+  const isList = lines.every(l => /^[-•*]/.test(l));
+  if (isList) {
+    return '<ul>' + 
+      lines.map(l => `<li>${escapeHtml(l.replace(/^[-•*]\s*/, ''))}</li>`).join('') + 
+    '</ul>';
   }
+
+  // Plusieurs paragraphes préservés
+  return lines.map(l => `<p>${escapeHtml(l)}</p>`).join('');
+}
 
   // ============================================================
   // BURGER MENU
