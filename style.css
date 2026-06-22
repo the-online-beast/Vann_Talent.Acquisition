@@ -315,11 +315,9 @@ button { cursor: pointer; font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: var(--surface);
+  background: transparent;
 }
+
 
 .jobs-state {
   text-align: center;
@@ -333,9 +331,9 @@ button { cursor: pointer; font-family: inherit; }
    JOB ROW (anciennement job-card)
 ============================================================ */
 .job-card {
-  background: var(--surface);
+  background: transparent;
   border-bottom: 1px solid var(--border);
-  padding: 18px 24px;
+  padding: 18px 4px;
   cursor: pointer;
   transition: background 0.15s;
   display: grid;
@@ -348,8 +346,9 @@ button { cursor: pointer; font-family: inherit; }
   border-bottom: none;
 }
 .job-card:hover {
-  background: var(--tag-bg);
+  background: rgba(0,0,0,0.03);
 }
+
 
 /* Colonne gauche : titre + meta */
 .job-card__top {
