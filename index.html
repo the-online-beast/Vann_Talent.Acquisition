@@ -52,7 +52,36 @@
     <section class="section" id="about">
       <div class="container about__inner">
         <div class="about__image">
-          <img src="assets/vann.png" alt="Vann Selvarajoo" />
+          <div
+              class="about__photo-wrap"
+              style="
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                overflow: hidden;
+                margin: 0 auto 16px;
+                flex-shrink: 0;
+              "
+            >
+              <img
+                src="assets/vann.png"
+                alt="Vann Selvarajoo — Education Talent Acquisition Specialist"
+                class="about__photo"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  object-position: center top;
+                  display: block;
+                "
+                onerror="
+                  this.style.display = 'none';
+                  document.querySelector(
+                    '.about__photo-fallback',
+                  ).style.display = 'flex';
+                "
+              />
+              <div class="about__photo-fallback" aria-hidden="true">VS</div>
         </div>
         <div class="about__content">
           <p class="section-eyebrow">About</p>
