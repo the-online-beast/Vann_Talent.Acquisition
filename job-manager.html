@@ -1,804 +1,997 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Offers Manager</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Offers Manager</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    :root {
-      --blue: #1e3a5f;
-      --blue-light: #2a5080;
-      --blue-hover: #163049;
-      --bg: #f4f6f9;
-      --card-bg: #ffffff;
-      --text: #1a1a2e;
-      --text-muted: #6b7280;
-      --border: #e2e8f0;
-      --danger: #e53e3e;
-      --danger-light: #fff5f5;
-      --success: #2f855a;
-      --success-light: #f0fff4;
-      --warning: #d97706;
-      --radius: 12px;
-      --shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
+      :root {
+        --blue: #1e3a5f;
+        --blue-light: #2a5080;
+        --blue-hover: #163049;
+        --bg: #f4f6f9;
+        --card-bg: #ffffff;
+        --text: #1a1a2e;
+        --text-muted: #6b7280;
+        --border: #e2e8f0;
+        --danger: #e53e3e;
+        --danger-light: #fff5f5;
+        --success: #2f855a;
+        --success-light: #f0fff4;
+        --warning: #d97706;
+        --radius: 12px;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
 
-    /* HEADER */
-    header {
-      background: var(--blue);
-      color: #fff;
-      padding: 32px 24px 28px;
-      text-align: center;
-    }
-    header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
-    header p { font-size: 0.95rem; opacity: 0.8; }
+      header {
+        background: var(--blue);
+        color: #fff;
+        padding: 32px 24px 28px;
+        text-align: center;
+      }
+      header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+      }
+      header p {
+        font-size: 0.95rem;
+        opacity: 0.8;
+      }
 
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 0;
-      max-width: 820px;
-      margin: 28px auto 0;
-      padding: 0 20px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 11px 20px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-    .tab-btn:first-child { border-radius: 10px 0 0 10px; }
-    .tab-btn:last-child  { border-radius: 0 10px 10px 0; border-left: none; }
-    .tab-btn.active {
-      background: var(--blue);
-      color: #fff;
-      border-color: var(--blue);
-    }
+      .tabs {
+        display: flex;
+        max-width: 820px;
+        margin: 28px auto 0;
+        padding: 0 20px;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 11px 20px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        border: 1.5px solid var(--border);
+        background: #fff;
+        color: var(--text-muted);
+        transition: all 0.2s;
+      }
+      .tab-btn:first-child {
+        border-radius: 10px 0 0 10px;
+      }
+      .tab-btn:last-child {
+        border-radius: 0 10px 10px 0;
+        border-left: none;
+      }
+      .tab-btn.active {
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+      }
 
-    /* CONTAINER */
-    .container {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 24px 20px 48px;
-    }
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 24px 20px 48px;
+      }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
 
-    /* CARD */
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px;
-      margin-bottom: 20px;
-    }
-    .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 22px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+      .card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--blue);
+        margin-bottom: 22px;
+      }
 
-    /* FORM GRID */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-    @media (max-width: 580px) { .form-grid { grid-template-columns: 1fr; } }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 580px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
 
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field.full { grid-column: 1 / -1; }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
 
-    label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    label .req { color: var(--danger); margin-left: 2px; }
+      label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      label .req {
+        color: var(--danger);
+        margin-left: 2px;
+      }
 
-    input[type="text"],
-    input[type="number"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-family: inherit;
-      background: #fafbfc;
-      color: var(--text);
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none;
-      resize: vertical;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(30,58,95,0.1);
-      background: #fff;
-    }
-    input.error, select.error, textarea.error { border-color: var(--danger); }
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.92rem;
+        font-family: inherit;
+        background: #fafbfc;
+        color: var(--text);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        outline: none;
+        resize: vertical;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        background: #fff;
+      }
+      input.error,
+      select.error,
+      textarea.error {
+        border-color: var(--danger);
+      }
 
-    .field-note { font-size: 0.78rem; color: var(--text-muted); }
-    .field-error { font-size: 0.78rem; color: var(--danger); font-weight: 500; display: none; }
-    .field-error.visible { display: block; }
+      .field-note {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+      .field-error {
+        font-size: 0.78rem;
+        color: var(--danger);
+        font-weight: 500;
+        display: none;
+      }
+      .field-error.visible {
+        display: block;
+      }
 
-    /* BULLET EDITOR */
-    .bullet-editor {
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      background: #fafbfc;
-      padding: 12px;
-    }
-    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .bullet-item { display: flex; align-items: center; gap: 8px; }
-    .bullet-bullet { color: var(--blue); font-size: 1.1rem; flex-shrink: 0; }
-    .bullet-input {
-      flex: 1;
-      padding: 7px 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.88rem;
-      font-family: inherit;
-      background: #fff;
-      outline: none;
-      resize: none;
-    }
-    .bullet-input:focus { border-color: var(--blue); }
-    .bullet-remove {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.85rem;
-      padding: 4px;
-      border-radius: 4px;
-      transition: color 0.2s, background 0.2s;
-      flex-shrink: 0;
-    }
-    .bullet-remove:hover { color: var(--danger); background: var(--danger-light); }
-    .btn-add-bullet {
-      margin-top: 10px;
-      background: none;
-      border: 1.5px dashed var(--border);
-      border-radius: 6px;
-      padding: 7px 14px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--blue);
-      cursor: pointer;
-      width: 100%;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .btn-add-bullet:hover { border-color: var(--blue); background: #f0f4f8; }
+      .bullet-editor {
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        background: #fafbfc;
+        padding: 12px;
+      }
+      .bullet-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .bullet-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bullet-bullet {
+        color: var(--blue);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .bullet-input {
+        flex: 1;
+        padding: 7px 10px;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-family: inherit;
+        background: #fff;
+        outline: none;
+      }
+      .bullet-input:focus {
+        border-color: var(--blue);
+      }
+      .bullet-remove {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 4px;
+        border-radius: 4px;
+        transition:
+          color 0.2s,
+          background 0.2s;
+        flex-shrink: 0;
+      }
+      .bullet-remove:hover {
+        color: var(--danger);
+        background: var(--danger-light);
+      }
+      .btn-add-bullet {
+        margin-top: 10px;
+        background: none;
+        border: 1.5px dashed var(--border);
+        border-radius: 6px;
+        padding: 7px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--blue);
+        cursor: pointer;
+        width: 100%;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .btn-add-bullet:hover {
+        border-color: var(--blue);
+        background: #f0f4f8;
+      }
 
-    /* STATUS BADGE */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-    .badge--active   { background: #d1fae5; color: #065f46; }
-    .badge--hidden   { background: #f3f4f6; color: #6b7280; }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--blue);
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        padding: 13px 28px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+      .btn-primary:hover {
+        background: var(--blue-hover);
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
 
-    /* SUBMIT BUTTON */
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 13px 32px;
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      width: 100%;
-    }
-    .btn-primary:hover { background: var(--blue-hover); }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+      .spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2.5px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+      .badge--active {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+      }
+      .badge--hidden {
+        background: #f3f4f6;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+      }
 
-    /* ALERTS */
-    .alert {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 500;
-      margin-bottom: 16px;
-    }
-    .alert.visible { display: flex; }
-    .alert--success { background: var(--success-light); border: 1.5px solid #68d391; color: var(--success); }
-    .alert--error   { background: var(--danger-light);  border: 1.5px solid #fc8181; color: var(--danger); }
+      .alert {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.88rem;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+      .alert.visible {
+        display: flex;
+      }
+      .alert--success {
+        background: var(--success-light);
+        border: 1.5px solid #68d391;
+        color: var(--success);
+      }
+      .alert--error {
+        background: var(--danger-light);
+        border: 1.5px solid #fc8181;
+        color: var(--danger);
+      }
 
-    /* JOBS TABLE */
-    .jobs-list { display: flex; flex-direction: column; gap: 14px; }
-    .job-row {
-      background: #fff;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .job-row__info { flex: 1; min-width: 180px; }
-    .job-row__title { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-    .job-row__meta  { font-size: 0.82rem; color: var(--text-muted); }
-    .job-row__actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+      .jobs-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .job-row {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .job-row__info {
+        flex: 1;
+        min-width: 180px;
+      }
+      .job-row__title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .job-row__meta {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
+      .job-row__actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+      }
 
-    .btn-icon {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: 7px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      border: 1.5px solid transparent;
-      transition: all 0.2s;
-    }
-    .btn-icon--toggle-on  { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
-    .btn-icon--toggle-on:hover  { background: #a7f3d0; }
-    .btn-icon--toggle-off { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
-    .btn-icon--toggle-off:hover { background: #e5e7eb; }
-    .btn-icon--delete { background: var(--danger-light); color: var(--danger); border-color: #fc8181; }
-    .btn-icon--delete:hover { background: #fed7d7; }
+      .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 7px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        border: 1.5px solid transparent;
+        transition: all 0.2s;
+      }
+      .btn-icon--toggle-on {
+        background: #d1fae5;
+        color: #065f46;
+        border-color: #6ee7b7;
+      }
+      .btn-icon--toggle-on:hover {
+        background: #a7f3d0;
+      }
+      .btn-icon--toggle-off {
+        background: #f3f4f6;
+        color: #6b7280;
+        border-color: #d1d5db;
+      }
+      .btn-icon--toggle-off:hover {
+        background: #e5e7eb;
+      }
 
-    .jobs-loading { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem; }
-    .jobs-empty   { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem; }
+      .jobs-loading {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+      .jobs-empty {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
 
-    .refresh-btn {
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--blue);
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s;
-      margin-bottom: 16px;
-    }
-    .refresh-btn:hover { background: #f0f4f8; border-color: var(--blue); }
+      .refresh-btn {
+        background: none;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 7px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--blue);
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.2s;
+        margin-bottom: 16px;
+      }
+      .refresh-btn:hover {
+        background: #f0f4f8;
+        border-color: var(--blue);
+      }
 
-    /* MODAL */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 28px;
-      max-width: 420px;
-      width: 100%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    }
-    .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
-    .modal p  { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; }
-    .modal-actions { display: flex; gap: 10px; }
-    .btn-cancel {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1.5px solid var(--border);
-      background: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.2s;
-    }
-    .btn-cancel:hover { background: #f3f4f6; }
-    .btn-confirm-delete {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: var(--danger);
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-confirm-delete:hover { background: #c53030; }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: var(--radius);
+        padding: 28px;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      }
+      .modal h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .modal p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-cancel {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.2s;
+      }
+      .btn-cancel:hover {
+        background: #f3f4f6;
+      }
+      .btn-confirm-delete {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: var(--danger);
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-confirm-delete:hover {
+        background: #c53030;
+      }
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-    }
-  </style>
-</head>
-<body>
+      footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Job Offers Manager</h1>
+      <p>Add and manage job offers — VS Recruitment</p>
+    </header>
 
-<header>
-  <h1>Job Offers Manager</h1>
-  <p>Add and manage job offers — VS Recruitment</p>
-</header>
-
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab-btn active" data-tab="add">➕ Add a Job Offer</button>
-  <button class="tab-btn" data-tab="manage">📋 Manage Offers</button>
-</div>
-
-<div class="container">
-
-  <!-- ══════════════════════════════════════
-       TAB 1 — ADD JOB OFFER
-  ══════════════════════════════════════ -->
-  <div class="tab-panel active" id="tab-add">
-
-    <div id="add-alert-success" class="alert alert--success">
-      ✅ Job offer submitted successfully! The page will update automatically.
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="add">Add a Job Offer</button>
+      <button class="tab-btn" data-tab="manage">Manage Offers</button>
     </div>
-    <div id="add-alert-error" class="alert alert--error">
-      ❌ Something went wrong. Please try again.
-    </div>
 
-    <div class="card">
-      <div class="card-title">📋 Job Offer Details</div>
-
-      <form id="job-form" novalidate>
-        <div class="form-grid">
-
-          <!-- Job Title -->
-          <div class="field">
-            <label for="job-title">Job title <span class="req">*</span></label>
-            <input type="text" id="job-title" placeholder="e.g. Maths Teacher" autocomplete="off">
-            <div class="field-error" id="err-job-title">This field is required.</div>
-          </div>
-
-          <!-- Establishment -->
-          <div class="field">
-            <label for="establishment">Establishment <span class="req">*</span></label>
-            <input type="text" id="establishment" placeholder="e.g. Red Cross KK" autocomplete="off">
-            <div class="field-error" id="err-establishment">This field is required.</div>
-          </div>
-
-          <!-- City -->
-          <div class="field">
-            <label for="city">City <span class="req">*</span></label>
-            <input type="text" id="city" placeholder="e.g. Kota Kinabalu" autocomplete="off">
-            <div class="field-error" id="err-city">This field is required.</div>
-          </div>
-
-          <!-- District -->
-          <div class="field">
-            <label for="district">District</label>
-            <input type="text" id="district" placeholder="e.g. North-East" autocomplete="off">
-          </div>
-
-          <!-- Contract Type -->
-          <div class="field">
-            <label for="contract-type">Contract type <span class="req">*</span></label>
-            <select id="contract-type">
-              <option value="">Select…</option>
-              <option>Full-Time</option>
-              <option>Part-Time</option>
-              <option>Contract</option>
-              <option>Temporary</option>
-              <option>Internship</option>
-            </select>
-            <div class="field-error" id="err-contract-type">This field is required.</div>
-          </div>
-
-          <!-- Salary -->
-          <div class="field">
-            <label for="salary">Annual base salary</label>
-            <input type="text" id="salary" placeholder="e.g. 48000" autocomplete="off">
-            <span class="field-note">In MYR, numbers only recommended</span>
-          </div>
-
-          <!-- Short Description -->
-          <div class="field full">
-            <label for="short-desc">Short description <span class="req">*</span></label>
-            <textarea id="short-desc" rows="3" placeholder="2–3 sentences summarising the role. You can paste from an existing JD and trim it here."></textarea>
-            <span class="field-note">Displayed on the job card — keep it concise.</span>
-            <div class="field-error" id="err-short-desc">This field is required.</div>
-          </div>
-
-          <!-- Long Description -->
-          <div class="field full">
-            <label for="long-desc">Long description <span class="req">*</span></label>
-            <textarea id="long-desc" rows="7" placeholder="Paste the full job description here. You can paste directly from a PDF or document — just trim irrelevant parts."></textarea>
-            <span class="field-note">Displayed in the full job detail modal.</span>
-            <div class="field-error" id="err-long-desc">This field is required.</div>
-          </div>
-
-          <!-- Requirements (bullet editor) -->
-          <div class="field full">
-            <label>Requirements <span class="req">*</span></label>
-            <div class="bullet-editor">
-              <ul class="bullet-list" id="requirements-list">
-                <li class="bullet-item">
-                  <span class="bullet-bullet">•</span>
-                  <input type="text" class="bullet-input" placeholder="e.g. Bachelor's degree in Education">
-                  <button type="button" class="bullet-remove" title="Remove">✕</button>
-                </li>
-              </ul>
-              <button type="button" class="btn-add-bullet" id="add-bullet-btn">+ Add a requirement</button>
-            </div>
-            <div class="field-error" id="err-requirements">At least one requirement is needed.</div>
-          </div>
-
-        </div><!-- /.form-grid -->
-
-        <div style="margin-top: 28px;">
-          <button type="submit" class="btn-primary" id="submit-btn">
-            <span id="submit-text">🚀 Submit Job Offer</span>
-            <span class="spinner" id="submit-spinner"></span>
-          </button>
+    <div class="container">
+      <!-- TAB 1 — ADD -->
+      <div class="tab-panel active" id="tab-add">
+        <div id="add-alert-success" class="alert alert--success">
+          Job offer submitted successfully.
+        </div>
+        <div id="add-alert-error" class="alert alert--error">
+          Something went wrong. Please try again.
         </div>
 
-      </form>
+        <div class="card">
+          <div class="card-title">Job Offer Details</div>
+          <form id="job-form" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="job-title"
+                  >Job title <span class="req">*</span></label
+                >
+                <input
+                  type="text"
+                  id="job-title"
+                  placeholder="e.g. Maths Teacher"
+                  autocomplete="off"
+                />
+                <div class="field-error" id="err-job-title">
+                  This field is required.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="establishment"
+                  >Establishment <span class="req">*</span></label
+                >
+                <input
+                  type="text"
+                  id="establishment"
+                  placeholder="e.g. Red Cross KK"
+                  autocomplete="off"
+                />
+                <div class="field-error" id="err-establishment">
+                  This field is required.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="city">City <span class="req">*</span></label>
+                <input
+                  type="text"
+                  id="city"
+                  placeholder="e.g. Kota Kinabalu"
+                  autocomplete="off"
+                />
+                <div class="field-error" id="err-city">
+                  This field is required.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="district"
+                  >Requirements <span class="req">*</span></label
+                >
+                <input
+                  type="text"
+                  id="requirements"
+                  placeholder="e.g. Bachelor's degree..."
+                  autocomplete="off"
+                />
+                <div class="field-error" id="err-requirements">
+                  This field is required.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="contract-type"
+                  >Contract type <span class="req">*</span></label
+                >
+                <select id="contract-type">
+                  <option value="">Select…</option>
+                  <option>Full-Time</option>
+                  <option>Part-Time</option>
+                  <option>Contract</option>
+                  <option>Temporary</option>
+                  <option>Internship</option>
+                </select>
+                <div class="field-error" id="err-contract-type">
+                  This field is required.
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="salary">Annual base salary</label>
+                <input
+                  type="text"
+                  id="salary"
+                  placeholder="e.g. 48000"
+                  autocomplete="off"
+                />
+                <span class="field-note">In MYR, numbers only recommended</span>
+              </div>
+
+              <div class="field full">
+                <label for="long-desc"
+                  >Long description <span class="req">*</span></label
+                >
+                <textarea
+                  id="long-desc"
+                  rows="7"
+                  placeholder="Paste the full job description here."
+                ></textarea>
+                <span class="field-note"
+                  >Displayed in the full job detail modal.</span
+                >
+                <div class="field-error" id="err-long-desc">
+                  This field is required.
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 28px">
+              <button type="submit" class="btn-primary" id="submit-btn">
+                <span id="submit-text">Submit Job Offer</span>
+                <span class="spinner" id="submit-spinner"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2 — MANAGE -->
+      <div class="tab-panel" id="tab-manage">
+        <div id="manage-alert-success" class="alert alert--success"></div>
+        <div id="manage-alert-error" class="alert alert--error"></div>
+
+        <div class="card">
+          <div class="card-title">Current Job Offers</div>
+          <button class="refresh-btn" id="refresh-btn">Refresh list</button>
+          <div id="jobs-loading" class="jobs-loading">Loading offers…</div>
+          <div id="jobs-empty" class="jobs-empty" style="display: none">
+            No job offers found.
+          </div>
+          <div id="jobs-list" class="jobs-list" style="display: none"></div>
+        </div>
+      </div>
     </div>
-  </div><!-- /#tab-add -->
 
+    <footer>
+      VS Recruitment — Job Manager &nbsp;|&nbsp; Data synced with Google Sheets
+      DB_jobs
+    </footer>
 
-  <!-- ══════════════════════════════════════
-       TAB 2 — MANAGE OFFERS
-  ══════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-manage">
+    <script>
+      const WEBHOOK_ADD = "https://n8n.strength-os.tech/webhook/job-managment";
+      const WEBHOOK_UPDATE =
+        "https://script.google.com/macros/s/AKfycbwQDVbW1_48h0EliBld9RLGA98mssLqMfMbeTvR4_5X72j2S9fGHsztBi_sH2XWEkMh/exec";
+      const WEBHOOK_DELETE = "https://n8n.strength-os.tech/webhook/job-delete";
+      const JOBS_API = "https://n8n.strength-os.tech/webhook/get-jobs";
 
-    <div id="manage-alert-success" class="alert alert--success"></div>
-    <div id="manage-alert-error"   class="alert alert--error"></div>
-
-    <div class="card">
-      <div class="card-title">📋 Current Job Offers</div>
-
-      <button class="refresh-btn" id="refresh-btn">🔄 Refresh list</button>
-
-      <div id="jobs-loading" class="jobs-loading">Loading offers…</div>
-      <div id="jobs-empty"   class="jobs-empty"   style="display:none">No job offers found.</div>
-      <div id="jobs-list"    class="jobs-list"     style="display:none"></div>
-    </div>
-
-  </div><!-- /#tab-manage -->
-
-</div><!-- /.container -->
-
-<!-- DELETE CONFIRM MODAL -->
-<div class="modal-overlay" id="delete-modal">
-  <div class="modal">
-    <h3>Delete this offer?</h3>
-    <p id="delete-modal-text">This action cannot be undone. The offer will be permanently removed from the database.</p>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="delete-cancel">Cancel</button>
-      <button class="btn-confirm-delete" id="delete-confirm">Delete</button>
-    </div>
-  </div>
-</div>
-
-<footer>
-  VS Recruitment — Job Manager &nbsp;|&nbsp; Data synced with Google Sheets DB_jobs
-</footer>
-
-<script>
-  // ══════════════════════════════════════════════════
-  // CONFIG
-  // ══════════════════════════════════════════════════
-  const WEBHOOK_ADD    = 'https://n8n.strength-os.tech/webhook/job-managment';
-  const WEBHOOK_UPDATE = 'https://n8n.strength-os.tech/webhook/job-update';
-  const CSV_URL        = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyMUBGgcev-QNFR998-lUvC5bsAuAabM-IkPt2vlLCpjWTOAXVj3jhK_wV0COYcpkvu5OhFe8gJqfB/pub?gid=0&single=true&output=csv';
-
-  // ══════════════════════════════════════════════════
-  // TABS
-  // ══════════════════════════════════════════════════
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-      if (btn.dataset.tab === 'manage') loadJobs();
-    });
-  });
-
-  // ══════════════════════════════════════════════════
-  // BULLET EDITOR
-  // ══════════════════════════════════════════════════
-  function addBullet(value = '') {
-    const li = document.createElement('li');
-    li.className = 'bullet-item';
-    li.innerHTML = `
-      <span class="bullet-bullet">•</span>
-      <input type="text" class="bullet-input" placeholder="e.g. Relevant certification" value="${value}">
-      <button type="button" class="bullet-remove" title="Remove">✕</button>
-    `;
-    li.querySelector('.bullet-remove').addEventListener('click', () => li.remove());
-    document.getElementById('requirements-list').appendChild(li);
-  }
-
-  document.getElementById('add-bullet-btn').addEventListener('click', () => addBullet());
-
-  // Bind initial remove button
-  document.querySelector('.bullet-remove').addEventListener('click', function() {
-    this.closest('.bullet-item').remove();
-  });
-
-  function getBulletValues() {
-    return [...document.querySelectorAll('#requirements-list .bullet-input')]
-      .map(i => i.value.trim())
-      .filter(Boolean);
-  }
-
-  // ══════════════════════════════════════════════════
-  // VALIDATION
-  // ══════════════════════════════════════════════════
-  function showError(id) {
-    document.getElementById('err-' + id)?.classList.add('visible');
-    document.getElementById(id)?.classList.add('error');
-  }
-  function clearErrors() {
-    document.querySelectorAll('.field-error').forEach(e => e.classList.remove('visible'));
-    document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
-  }
-
-  function validate() {
-    clearErrors();
-    let valid = true;
-    const required = ['job-title', 'establishment', 'city', 'contract-type', 'short-desc', 'long-desc'];
-    required.forEach(id => {
-      const el = document.getElementById(id);
-      if (!el.value.trim()) { showError(id); valid = false; }
-    });
-    if (!getBulletValues().length) {
-      document.getElementById('err-requirements').classList.add('visible');
-      valid = false;
-    }
-    return valid;
-  }
-
-  // ══════════════════════════════════════════════════
-  // ALERTS
-  // ══════════════════════════════════════════════════
-  function showAlert(id, msg = null) {
-    const el = document.getElementById(id);
-    if (msg) el.innerHTML = msg;
-    el.classList.add('visible');
-    setTimeout(() => el.classList.remove('visible'), 5000);
-  }
-
-  // ══════════════════════════════════════════════════
-  // FORM SUBMIT — ADD JOB
-  // ══════════════════════════════════════════════════
-  document.getElementById('job-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    const btn     = document.getElementById('submit-btn');
-    const spinner = document.getElementById('submit-spinner');
-    const text    = document.getElementById('submit-text');
-
-    btn.disabled = true;
-    spinner.style.display = 'inline-block';
-    text.style.display    = 'none';
-
-    const payload = {
-      'Job title':           document.getElementById('job-title').value.trim(),
-      'Establishment':       document.getElementById('establishment').value.trim(),
-      'City':                document.getElementById('city').value.trim(),
-      'Discrict':            document.getElementById('district').value.trim(),
-      'Contract type':       document.getElementById('contract-type').value,
-      'Annual base salary':  document.getElementById('salary').value.trim(),
-      'Short description':   document.getElementById('short-desc').value.trim(),
-      'Long description':    document.getElementById('long-desc').value.trim(),
-      'Requirements':        getBulletValues().join(' | '),
-      'Status':              'active'
-    };
-
-    try {
-      const res = await fetch(WEBHOOK_ADD, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error();
-      showAlert('add-alert-success', '✅ Job offer submitted! The page will update automatically within a few seconds.');
-      document.getElementById('job-form').reset();
-      document.querySelectorAll('#requirements-list .bullet-item').forEach((li, i) => { if (i > 0) li.remove(); });
-      document.querySelector('.bullet-input').value = '';
-    } catch {
-      showAlert('add-alert-error', '❌ Something went wrong. Please check your connection and try again.');
-    } finally {
-      btn.disabled = false;
-      spinner.style.display = 'none';
-      text.style.display    = 'inline';
-    }
-  });
-
-  // ══════════════════════════════════════════════════
-  // CSV PARSER
-  // ══════════════════════════════════════════════════
-  function parseCSV(text) {
-    const lines = text.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
-    return lines.slice(1).map(line => {
-      // Basic CSV parse (handles quoted fields)
-      const values = [];
-      let cur = '', inQ = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === ',' && !inQ) { values.push(cur.trim()); cur = ''; }
-        else { cur += ch; }
+      // ── UTILS ──────────────────────────────────────────
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, "&")
+          .replace(/</g, "<")
+          .replace(/>/g, ">");
       }
-      values.push(cur.trim());
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = values[i] || '');
-      return obj;
-    });
-  }
 
-  // ══════════════════════════════════════════════════
-  // LOAD JOBS
-  // ══════════════════════════════════════════════════
-  async function loadJobs() {
-    const loading = document.getElementById('jobs-loading');
-    const empty   = document.getElementById('jobs-empty');
-    const list    = document.getElementById('jobs-list');
+      // Supprime tous les retours à la ligne et remplace par un espace
+      function stripNewlines(str) {
+        return str
+          .replace(/\r\n/g, " ")
+          .replace(/\r/g, " ")
+          .replace(/\n/g, " ")
+          .trim();
+      }
 
-    loading.style.display = 'block';
-    empty.style.display   = 'none';
-    list.style.display    = 'none';
-    list.innerHTML        = '';
+      // ── TABS ───────────────────────────────────────────
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-btn")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-panel")
+            .forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .getElementById("tab-" + btn.dataset.tab)
+            .classList.add("active");
+          if (btn.dataset.tab === "manage") loadJobs();
+        });
+      });
 
-    try {
-      const res  = await fetch(CSV_URL + '&t=' + Date.now());
-      const text = await res.text();
-      const jobs = parseCSV(text);
+      // ── VALIDATION ─────────────────────────────────────
+      function showError(id) {
+        document.getElementById("err-" + id)?.classList.add("visible");
+        document.getElementById(id)?.classList.add("error");
+      }
 
-      loading.style.display = 'none';
+      function clearErrors() {
+        document
+          .querySelectorAll(".field-error")
+          .forEach((e) => e.classList.remove("visible"));
+        document
+          .querySelectorAll(".error")
+          .forEach((e) => e.classList.remove("error"));
+      }
 
-      if (!jobs.length) { empty.style.display = 'block'; return; }
+      function validate() {
+        clearErrors();
+        let valid = true;
 
-      list.style.display = 'flex';
-      jobs.forEach((job, idx) => renderJobRow(job, idx));
-    } catch {
-      loading.style.display = 'none';
-      showAlert('manage-alert-error', '❌ Failed to load offers. Please refresh.');
-    }
-  }
+        [
+          "job-title",
+          "establishment",
+          "city",
+          "requirements",
+          "contract-type",
+          "long-desc",
+        ].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el.value.trim()) {
+            showError(id);
+            valid = false;
+          }
+        });
 
-  function renderJobRow(job, idx) {
-    const list    = document.getElementById('jobs-list');
-    const title   = job['Job title']     || 'Untitled';
-    const school  = job['Establishment'] || '';
-    const city    = job['City']         || '';
-    const type    = job['Contract type'] || '';
-    const status  = (job['Status'] || 'active').toLowerCase().trim();
-    const isActive = status === 'active';
+        return valid;
+      }
 
-    const row = document.createElement('div');
-    row.className = 'job-row';
-    row.dataset.idx = idx;
-    row.innerHTML = `
+      // ── ALERTS ─────────────────────────────────────────
+      function showAlert(id, msg = null) {
+        const el = document.getElementById(id);
+        if (msg) el.innerHTML = msg;
+        el.classList.add("visible");
+        setTimeout(() => el.classList.remove("visible"), 5000);
+      }
+
+      // ── FORM SUBMIT ────────────────────────────────────
+      function generateJobId() {
+        return (
+          "job_" +
+          Date.now().toString(36) +
+          "_" +
+          Math.random().toString(36).slice(2, 8)
+        );
+      }
+
+      document
+        .getElementById("job-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (!validate()) return;
+
+          const btn = document.getElementById("submit-btn");
+          const spinner = document.getElementById("submit-spinner");
+          const text = document.getElementById("submit-text");
+
+          btn.disabled = true;
+          spinner.style.display = "inline-block";
+          text.style.display = "none";
+
+          const payload = {
+            jobId: generateJobId(), // <-- AJOUT
+            "Job title": document.getElementById("job-title").value.trim(),
+            Establishment: document
+              .getElementById("establishment")
+              .value.trim(),
+            City: document.getElementById("city").value.trim(),
+            "Contract type": document.getElementById("contract-type").value,
+            "Annual base salary": document
+              .getElementById("salary")
+              .value.trim(),
+
+            "Long description": stripNewlines(
+              document.getElementById("long-desc").value,
+            ),
+            Requirements: document.getElementById("requirements").value.trim(), // <-- voir point 3
+            Status: "active",
+          };
+
+          try {
+            await fetch(WEBHOOK_ADD, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            showAlert("add-alert-success");
+            document.getElementById("job-form").reset();
+            document
+              .querySelectorAll(".req-input")
+              .forEach((i) => (i.value = ""));
+          } catch {
+            showAlert("add-alert-error");
+          } finally {
+            btn.disabled = false;
+            spinner.style.display = "none";
+            text.style.display = "inline";
+          }
+        });
+
+      // ── LOAD JOBS ──────────────────────────────────────
+      async function loadJobs() {
+        const loading = document.getElementById("jobs-loading");
+        const empty = document.getElementById("jobs-empty");
+        const list = document.getElementById("jobs-list");
+
+        loading.style.display = "block";
+        empty.style.display = "none";
+        list.style.display = "none";
+        list.innerHTML = "";
+
+        try {
+          const res = await fetch(JOBS_API + "?t=" + Date.now());
+          const jobs = await res.json();
+
+          loading.style.display = "none";
+
+          if (!jobs.length) {
+            empty.style.display = "block";
+            return;
+          }
+
+          list.style.display = "flex";
+          jobs.forEach((job, idx) => renderJobRow(job, idx));
+        } catch {
+          loading.style.display = "none";
+          showAlert(
+            "manage-alert-error",
+            "Failed to load offers. Please refresh.",
+          );
+        }
+      }
+
+      // ── RENDER ROW ─────────────────────────────────────
+      function renderJobRow(job, idx) {
+        const list = document.getElementById("jobs-list");
+        const title = job["Job title"] || "Untitled";
+        const school = job["Establishment"] || "";
+        const city = job["City"] || "";
+        const type = job["Contract type"] || "";
+        const status = (job["Status"] || "active").toLowerCase().trim();
+        const isActive = status === "active";
+
+        const row = document.createElement("div");
+        row.className = "job-row";
+        row.innerHTML = `
       <div class="job-row__info">
         <div class="job-row__title">${escHtml(title)}</div>
         <div class="job-row__meta">${escHtml(school)} · ${escHtml(city)} · ${escHtml(type)}</div>
       </div>
       <div class="job-row__actions">
-        <span class="badge ${isActive ? 'badge--active' : 'badge--hidden'}">
-          ${isActive ? '🟢 Active' : '⚫ Hidden'}
-        </span>
-        <button class="btn-icon ${isActive ? 'btn-icon--toggle-on' : 'btn-icon--toggle-off'}" data-action="toggle">
-          ${isActive ? 'Hide' : 'Activate'}
-        </button>
-        <button class="btn-icon btn-icon--delete" data-action="delete">🗑 Delete</button>
-      </div>
+  <span class="badge ${isActive ? "badge--active" : "badge--hidden"}">
+    ${isActive ? "Active" : "Hidden"}
+  </span>
+  <button class="btn-icon ${isActive ? "btn-icon--toggle-on" : "btn-icon--toggle-off"}" data-action="toggle">
+    ${isActive ? "Hide" : "Activate"}
+  </button>
+</div>
     `;
 
-    // Toggle
-    row.querySelector('[data-action="toggle"]').addEventListener('click', () => {
-      const newStatus = isActive ? 'hidden' : 'active';
-      updateJob(job, newStatus, row);
-    });
+        row
+          .querySelector('[data-action="toggle"]')
+          .addEventListener("click", () => {
+            updateJob(job, isActive ? "hidden" : "active", row);
+          });
 
-    // Delete
-    row.querySelector('[data-action="delete"]').addEventListener('click', () => {
-      openDeleteModal(job, row);
-    });
+        list.appendChild(row);
+      }
 
-    list.appendChild(row);
-  }
+      // ── TOGGLE STATUS ──────────────────────────────────
+      async function updateJob(job, newStatus, rowEl) {
+        const toggleBtn = rowEl.querySelector('[data-action="toggle"]');
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = "…";
 
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>');
-  }
+        try {
+          const res = await fetch(WEBHOOK_UPDATE, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" }, // important avec no-cors
+            body: JSON.stringify({
+              jobId: job["JobID"],
+              Status: newStatus,
+            }),
+          });
+          // no-cors = réponse opaque, on affiche le succès directement
+          showAlert(
+            "manage-alert-success",
+            `"${job["Job title"]}" is now ${newStatus}.`,
+          );
+          setTimeout(() => loadJobs(), 2000);
+        } finally {
+          toggleBtn.disabled = false;
+          toggleBtn.textContent = newStatus === "hidden" ? "Hide" : "Activate";
+        }
+      }
 
-  // ══════════════════════════════════════════════════
-  // TOGGLE STATUS
-  // ══════════════════════════════════════════════════
-  async function updateJob(job, newStatus, rowEl) {
-    const toggleBtn = rowEl.querySelector('[data-action="toggle"]');
-    toggleBtn.disabled = true;
-    toggleBtn.textContent = '…';
+      // ── DELETE ─────────────────────────────────────────
+      let _deleteJob = null;
+      let _deleteRow = null;
 
-    try {
-      const res = await fetch(WEBHOOK_UPDATE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 'Job title': job['Job title'], 'Status': newStatus })
+      function openDeleteModal(job, row) {
+        _deleteJob = job;
+        _deleteRow = row;
+        document.getElementById("delete-modal-text").textContent =
+          `"${job["Job title"]}" will be permanently removed. This cannot be undone.`;
+        document.getElementById("delete-modal").classList.add("open");
+      }
+
+      document.getElementById("delete-cancel").addEventListener("click", () => {
+        document.getElementById("delete-modal").classList.remove("open");
+        _deleteJob = null;
+        _deleteRow = null;
       });
-      if (!res.ok) throw new Error();
-      showAlert('manage-alert-success', `✅ "${job['Job title']}" is now ${newStatus}.`);
-      setTimeout(() => loadJobs(), 1500);
-    } catch {
-      showAlert('manage-alert-error', '❌ Update failed. Please try again.');
-      toggleBtn.disabled = false;
-      toggleBtn.textContent = newStatus === 'hidden' ? 'Hide' : 'Activate';
-    }
-  }
 
-  // ══════════════════════════════════════════════════
-  // REFRESH
-  // ══════════════════════════════════════════════════
-  document.getElementById('refresh-btn').addEventListener('click', loadJobs);
+      document
+        .getElementById("delete-confirm")
+        .addEventListener("click", async () => {
+          if (!_deleteJob) return;
+          const job = _deleteJob;
 
-</script>
-</body>
+          document.getElementById("delete-modal").classList.remove("open");
+
+          const confirmBtn = document.getElementById("delete-confirm");
+          confirmBtn.disabled = true;
+          confirmBtn.textContent = "…";
+
+          try {
+            const res = await fetch(WEBHOOK_DELETE, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ jobId: job["JobID"] }),
+            });
+            if (!res.ok) throw new Error();
+            showAlert(
+              "manage-alert-success",
+              `"${job["Job title"]}" has been deleted.`,
+            );
+            setTimeout(() => loadJobs(), 1500);
+          } catch {
+            showAlert("manage-alert-error", "Delete failed. Please try again.");
+          } finally {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Delete";
+            _deleteJob = null;
+            _deleteRow = null;
+          }
+        });
+
+      // ── REFRESH ────────────────────────────────────────
+      document
+        .getElementById("refresh-btn")
+        .addEventListener("click", loadJobs);
+    </script>
+  </body>
 </html>
