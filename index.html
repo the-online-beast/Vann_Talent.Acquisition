@@ -49,63 +49,34 @@
     </section>
 
     <!-- ABOUT -->
-    <section class="section" id="about">
-      <div class="container about__inner">
-        <div class="about__image">
-          <div
-              class="about__photo-wrap"
-              style="
-                width: 120px;
-                height: 120px;
-                border-radius: 50%;
-                overflow: hidden;
-                margin: 0 auto 16px;
-                flex-shrink: 0;
-              "
-            >
-              <img
-                src="assets/vann.png"
-                alt="Vann Selvarajoo — Education Talent Acquisition Specialist"
-                class="about__photo"
-                style="
-                  width: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                  object-position: center top;
-                  display: block;
-                "
-                onerror="
-                  this.style.display = 'none';
-                  document.querySelector(
-                    '.about__photo-fallback',
-                  ).style.display = 'flex';
-                "
-              />
-              <div class="about__photo-fallback" aria-hidden="true">VS</div>
+<section class="section" id="about">
+  <div class="container about__inner">
+    <div class="about__image">
+      <img src="assets/vann.png" alt="Vann Selvarajoo" />
+    </div>
+    <div class="about__content">
+      <p class="section-eyebrow">About</p>
+      <h2 class="section-title">Hi, I'm Vann</h2>
+      <p>I'm an education recruitment consultant based in Kuala Lumpur, specialising in placing qualified teachers and academic staff in international and private schools across Malaysia.</p>
+      <p>With a deep network of partner schools and a genuine passion for education, I work closely with candidates to understand their goals — and match them with roles where they can truly thrive.</p>
+      <div class="about__stats">
+        <div class="stat">
+          <span class="stat__number">120+</span>
+          <span class="stat__label">Placements made</span>
         </div>
-        <div class="about__content">
-          <p class="section-eyebrow">About</p>
-          <h2 class="section-title">Hi, I'm Vann</h2>
-          <p>I'm an education recruitment consultant based in Kuala Lumpur, specialising in placing qualified teachers and academic staff in international and private schools across Malaysia.</p>
-          <p>With a deep network of partner schools and a genuine passion for education, I work closely with candidates to understand their goals — and match them with roles where they can truly thrive.</p>
-          <div class="about__stats">
-            <div class="stat">
-              <span class="stat__number">120+</span>
-              <span class="stat__label">Placements made</span>
-            </div>
-            <div class="stat">
-              <span class="stat__number">40+</span>
-              <span class="stat__label">Partner schools</span>
-            </div>
-            <div class="stat">
-              <span class="stat__number">8</span>
-              <span class="stat__label">Years experience</span>
-            </div>
-          </div>
-          <a href="#" class="btn btn--solid" id="aboutOpenForm">Submit your profile</a>
+        <div class="stat">
+          <span class="stat__number">40+</span>
+          <span class="stat__label">Partner schools</span>
+        </div>
+        <div class="stat">
+          <span class="stat__number">8</span>
+          <span class="stat__label">Years experience</span>
         </div>
       </div>
-    </section>
+      <a href="#" class="btn btn--solid" id="aboutOpenForm">Submit your profile</a>
+    </div>
+  </div>
+</section>
 
     <!-- VACANCIES -->
     <section class="section vacancies" id="vacancies">
