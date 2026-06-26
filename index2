@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vann Selvarajoo — Education Recruiter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <span class="navbar__brand">VS Recruitment</span>
+      <nav class="navbar__links">
+        <a href="#about">About</a>
+        <a href="#vacancies">Vacancies</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="navbar__burger" id="burgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="navbar__mobile" id="mobileMenu">
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#vacancies" class="mobile-link">Vacancies</a>
+      <a href="#contact" class="mobile-link">Contact</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <p class="hero__eyebrow">Education Recruitment · Malaysia</p>
+          <h1 class="hero__title">Connecting Talent, Creating Opportunities, Recruiting Across Industries.</h1>
+          <p class="hero__sub">From education to corporate leadership, helping professionals take the next step in their careers beyond the education industry.</p>
+          <div class="hero__ctas">
+            <a href="#vacancies" class="btn btn--solid">Browse vacancies</a>
+            <a href="#" class="btn btn--outline" id="heroOpenForm">Submit your profile</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container about__inner">
+   <div class="about__image">
+  <img src="assets/vann.png" alt="Vanessa Selvarajoo" style="border-radius: 50%; aspect-ratio: 1/1; object-fit: cover; object-position: center top;" />
+</div>
+    <div class="about__content">
+      <p class="section-eyebrow">About</p>
+      <h2 class="section-title">Hello, I'm Vanessa</h2>
+      <p>A Talent Acquisition & Partnership Specialist helping organizations connect with the right talent and build strong workforce partnerships across Malaysia, Singapore, and Japan.</p>
+      <p>I support recruitment for both academic and non-academic roles across industries including Accounting & Finance, Sales & Marketing, Construction, Food & Beverage, Human Resources, IT, Training, Manufacturing, and the Built Environment.</p>
+      <p>Beyond recruitment, I provide career advisory services, career talks, employability workshops, and talent partnership solutions for companies, educational institutions, and professionals.</p>
+      <p><strong>Smart Hiring Starts Here: Connecting talent, opportunities, and growth.</strong></p>
+      <div class="about__stats">
+        <div class="stat">
+          <span class="stat__number">40+</span>
+          <span class="stat__label">Partner schools</span>
+        </div>
+      </div>
+      <a href="#" class="btn btn--solid" id="aboutOpenForm">Submit your profile</a>
+    </div>
+  </div>
+</section>
+
+    <!-- VACANCIES -->
+    <section class="section vacancies" id="vacancies">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Open Positions</p>
+          <h2 class="section-title">Current Vacancies</h2>
+          <p class="section-subtitle">Roles updated regularly. Don't see the perfect fit? <a href="#" id="vacanciesOpenForm" class="link--accent">Submit your profile</a> and I'll reach out when something matches.</p>
+          <p class="vacancies__count" id="vacanciesCount"></p>
+        </div>
+
+        <div class="vacancies__filters">
+          <input type="text" id="filterSearch" class="filter-input" placeholder="Search title, school, city…" autocomplete="off" />
+          <select id="filterType" class="filter-select">
+            <option value="">All contract types</option>
+          </select>
+        </div>
+
+        <div id="jobsGrid" class="jobs-grid"></div>
+
+        <div id="jobsLoading" class="jobs-state">Loading vacancies…</div>
+        <div id="jobsError" class="jobs-state jobs-state--error" style="display:none">
+          <p>Could not load vacancies.</p>
+          <button class="btn btn--outline" id="retryBtn">Retry</button>
+        </div>
+        <div id="jobsEmpty" class="jobs-state" style="display:none">No positions match your search.</div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Get in touch</p>
+          <h2 class="section-title">Contact</h2>
+        </div>
+        <div class="contact__cards">
+          <div class="contact__card">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.571a.75.75 0 0 0 .92.92l5.716-1.471A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
+            </svg>
+            <div>
+              <p class="contact__card-label">WhatsApp</p>
+              <a href="https://wa.me/601162488408" target="_blank" rel="noopener" class="contact__card-value">+60 11-6248 8408</a>
+            </div>
+          </div>
+          <div class="contact__card">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            <div>
+              <p class="contact__card-label">LinkedIn</p>
+              <a href="https://www.linkedin.com/in/vann-selvarajoo/" target="_blank" rel="noopener" class="contact__card-value">Vann Selvarajoo</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="footer__copy">© 2026 VS Recruitment</span>
+      <span class="footer__sub">Kuala Lumpur, Malaysia</span>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       JOB DETAIL MODAL
+  ============================================================ -->
+  <div class="modal-overlay" id="jobModal" style="display:none">
+    <div class="modal">
+      <button class="modal__close" id="closeJobModal" aria-label="Close">✕</button>
+      <div class="job-detail__header">
+        <h2 id="jd-title"></h2>
+        <div class="job-detail__meta">
+          <span class="tag" id="jd-type"></span>
+          <span id="jd-location-text"></span>
+          <span id="jd-salary-text"></span>
+        </div>
+       <div class="job-detail__school-row">
+  <span id="jd-school"></span>
+</div>
+
+      </div>
+      <div class="job-detail__body">
+        <h3 class="job-detail__section-title">About the role</h3>
+        <div id="jd-description" class="job-detail__text"></div>
+        <h3 class="job-detail__section-title">Requirements</h3>
+        <div id="jd-requirements" class="job-detail__text"></div>
+      </div>
+      <div class="job-detail__footer">
+        <button class="btn btn--solid" id="jd-applyBtn">Apply for this position</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       APPLICATION MODAL
+  ============================================================ -->
+  <div class="modal-overlay" id="applyModal" style="display:none">
+    <div class="modal">
+      <button class="modal__close" id="closeApplyModal" aria-label="Close">✕</button>
+
+      <!-- Form state -->
+      <div id="applyFormState">
+        <h2 class="modal__title">Submit your profile</h2>
+        <p class="modal__subtitle">Fill in the form and I'll be in touch within 24 hours.</p>
+
+        <form id="applyForm" class="apply-form" novalidate>
+
+          <!-- Full Name + Email -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-name">Full Name <span class="required">*</span></label>
+              <input type="text" id="f-name" name="Full Name" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="f-email">Email <span class="required">*</span></label>
+              <input type="email" id="f-email" name="Email" required autocomplete="email" />
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-phone">Phone Number <span class="required">*</span></label>
+              <input type="tel" id="f-phone" name="Phone Number" required autocomplete="tel" />
+            </div>
+            <div class="form-group">
+              <label for="f-subject">Subject / Specialisation</label>
+              <input type="text" id="f-subject" name="Subject / Specialisation" placeholder="e.g. Mathematics, IB Biology…" autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Job Function + Targeted roles -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-jobfunction">Job Function <span class="required">*</span></label>
+              <select id="f-jobfunction" name="Job Function" required>
+                <option value="">Select…</option>
+                <option>Teaching</option>
+                <option>Leadership / Management</option>
+                <option>Support Staff</option>
+                <option>Administration</option>
+                <option>Counselling / Welfare</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="f-targeted">Targeted roles</label>
+              <input type="text" id="f-targeted" name="Targeted roles" placeholder="e.g. Head of Department, Form Tutor…" autocomplete="off" />
+            </div>
+          </div>
+
+                   <!-- Experience + Qualification -->
+          <div class="form-row">
+            <div class="form-group" style="flex: 1;">
+              <label for="f-experience">Years of Relevant Experience <span class="required">*</span></label>
+              <select id="f-experience" name="Years of Relevant Experience" required>
+                <option value="">Select…</option>
+                <option>0–1 year</option>
+                <option>2–3 years</option>
+                <option>4–6 years</option>
+                <option>7–10 years</option>
+                <option>10+ years</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label for="f-qualification">Highest Qualification <span class="required">*</span></label>
+              <select id="f-qualification" name="Highest Qualification" required>
+                <option value="">Select…</option>
+                <option>Primary/High School</option>
+                <option>Higher Secondary/STPM/A Level/Pre U</option>
+                <option>Certificate/Professional Certificate/Post Graduate Certificate</option>
+                <option>Diploma</option>
+                <option>Higher Diploma</option>
+                <option>Bachelor's Degree</option>
+                <option>Post Graduate Diploma/Degree</option>
+                <option>Master's Degree</option>
+                <option>Doctorate (PHD)</option>
+              </select>
+            </div>
+          </div>
+
+
+          <!-- Key Skills -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="f-skills">Key Skills & Competencies <span class="required">*</span></label>
+              <input type="text" id="f-skills" name="Key Skills & Competencies" placeholder="e.g. Curriculum design, IB PYP, classroom management…" required autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Languages -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Professional Languages <span class="required">*</span></label>
+              <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" name="languages" value="English" /> English</label>
+                <label class="checkbox-label"><input type="checkbox" name="languages" value="Bahasa Malaysia" /> Bahasa Malaysia</label>
+                <label class="checkbox-label"><input type="checkbox" name="languages" value="Mandarin" /> Mandarin</label>
+                <label class="checkbox-label"><input type="checkbox" name="languages" value="Other" /> Other</label>
+              </div>
+              <small id="err-languages" class="form-error"></small>
+            </div>
+          </div>
+
+          <!-- Salary + Preferred Locations -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="f-salary">Monthly Salary (MYR) <span class="required">*</span></label>
+              <select id="f-salary" name="Monthly Salary (MYR)" required>
+                <option value="">Please select</option>
+                <option>Below RM 2,000</option>
+                <option>RM 2,000 – RM 3,000</option>
+                <option>RM 3,000 – RM 4,000</option>
+                <option>RM 4,000 – RM 5,000</option>
+                <option>RM 5,000 – RM 6,000</option>
+                <option>RM 6,000 – RM 8,000</option>
+                <option>RM 8,000 – RM 10,000</option>
+                <option>RM 10,000 – RM 15,000</option>
+                <option>Above RM 15,000</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Preferred Locations -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>Preferred Locations <span class="required">*</span></label>
+              <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Kuala Lumpur" /> Kuala Lumpur</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Selangor" /> Selangor</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Penang" /> Penang</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Johor Bahru" /> Johor Bahru</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Sabah / Sarawak" /> Sabah / Sarawak</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Open to relocation" /> Open to relocation</label>
+                <label class="checkbox-label"><input type="checkbox" name="locations" value="Other" id="loc-other-cb" /> Other</label>
+              </div>
+              <div id="loc-other-row" style="display:none; margin-top:8px;">
+                <input type="text" id="f-loc-other" placeholder="Specify location…" autocomplete="off" />
+              </div>
+              <small id="err-locations" class="form-error"></small>
+            </div>
+          </div>
+
+          <!-- CV Upload -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label>CV / Resume <span class="required">*</span></label>
+              <div class="file-upload" id="fileDropZone">
+                <input type="file" id="f-cv" name="CV Upload" accept=".pdf,.doc,.docx" />
+                <div class="file-upload__content" id="fileDropContent">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <p><strong>Choose a file</strong> or drag & drop</p>
+                  <p class="file-upload__hint">PDF, DOC, DOCX — max 10 MB</p>
+                </div>
+                <div class="file-upload__preview" id="filePreview" style="display:none">
+                  <span id="filePreviewName"></span>
+                  <button type="button" id="fileRemoveBtn" class="file-upload__remove">Remove</button>
+                </div>
+              </div>
+              <small id="err-cv" class="form-error"></small>
+            </div>
+          </div>
+
+          <!-- Additional Notes -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label for="f-notes">Additional Notes</label>
+              <textarea id="f-notes" name="Additional Notes" rows="3" placeholder="Availability, notice period, preferred environment…" autocomplete="off"></textarea>
+            </div>
+          </div>
+
+          <!-- WhatsApp Info -->
+          <div class="form-row">
+            <div class="form-group full-width">
+              <p class="whatsapp-info">For enquiries, WhatsApp: <a href="https://wa.me/601162488408" target="_blank" rel="noopener">+60 11-6248 8408</a></p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn--solid btn--full" id="applySubmitBtn">
+            <span id="applyBtnText">Send my profile</span>
+            <span id="applyBtnSpinner" class="btn-spinner" style="display:none"></span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Success -->
+      <div id="applySuccess" style="display:none" class="modal__success">
+        <div class="success-icon">✓</div>
+        <h3>Profile received!</h3>
+        <p>Thank you — I will review your profile and be in touch within 24 hours.</p>
+        <button class="btn btn--outline" id="applySuccessClose">Close</button>
+      </div>
+
+      <!-- Error -->
+      <div id="applyError" style="display:none" class="modal__error">
+        <div class="error-icon">!</div>
+        <h3>Something went wrong</h3>
+        <p>Please try again or contact me directly on LinkedIn.</p>
+        <button class="btn btn--outline" id="applyRetryBtn">Try again</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="jobs.js"></script>
+  <script src="main.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"8607d2a720d14b038279025b2b5a82e5","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
